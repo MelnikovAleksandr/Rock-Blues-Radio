@@ -51,17 +51,8 @@ dependencies {
     implementation(libs.androidx.material3.adaptive.navigation3)
     implementation(libs.kotlinx.serialization.core)
 
-    // Ktor
-    implementation(libs.ktor.client.core)
-    implementation(libs.ktor.client.okhttp)
-    implementation(libs.ktor.client.content.negotiation)
-    implementation(libs.ktor.serialization.kotlinx.json)
-
     // Kotlinx Serialization
     implementation(libs.kotlinx.serialization.json)
-
-    // HTTP Logging
-    implementation(libs.logging.interceptor)
 
     // Room
     implementation(libs.androidx.room.runtime)
