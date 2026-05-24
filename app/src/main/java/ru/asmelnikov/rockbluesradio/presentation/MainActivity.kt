@@ -1,4 +1,4 @@
-package ru.asmelnikov.rockbluesradio
+package ru.asmelnikov.rockbluesradio.presentation
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -18,7 +18,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            RockBluesRadioTheme {
+            _root_ide_package_.ru.asmelnikov.rockbluesradio.presentation.ui.theme.RockBluesRadioTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Greeting(
                         name = "Android",
@@ -41,7 +41,7 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
-    RockBluesRadioTheme {
+    _root_ide_package_.ru.asmelnikov.rockbluesradio.presentation.ui.theme.RockBluesRadioTheme {
         Greeting("Android")
     }
 }

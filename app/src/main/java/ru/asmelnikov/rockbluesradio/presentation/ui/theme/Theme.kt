@@ -1,4 +1,4 @@
-package ru.asmelnikov.rockbluesradio.ui.theme
+package ru.asmelnikov.rockbluesradio.presentation.ui.theme
 
 import android.app.Activity
 import android.os.Build

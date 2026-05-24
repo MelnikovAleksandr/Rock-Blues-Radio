@@ -1,4 +1,4 @@
-package ru.asmelnikov.rockbluesradio.ui.theme
+package ru.asmelnikov.rockbluesradio.presentation.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
