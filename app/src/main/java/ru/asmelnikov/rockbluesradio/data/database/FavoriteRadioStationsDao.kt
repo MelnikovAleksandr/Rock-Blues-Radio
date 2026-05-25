@@ -9,8 +9,8 @@ import ru.asmelnikov.rockbluesradio.data.model.RadioStationDtoItem
 
 @Dao
 interface FavoriteRadioStationsDao {
-    @Query("SELECT * FROM RadioStationDtoItem ORDER BY name LIMIT :limit OFFSET :offset")
-    fun getAllFavoriteRadioStations(limit: Int, offset: Int): Flow<List<RadioStationDtoItem>>
+    @Query("SELECT * FROM RadioStationDtoItem ORDER BY name")
+    fun getAllFavoriteRadioStations(): Flow<List<RadioStationDtoItem>>
 
     @Query("SELECT stationuuid FROM RadioStationDtoItem WHERE stationuuid = :stationUuid")
     suspend fun getFavoriteRadioStationByStationUUID(stationUuid: String): RadioStationDtoItem?

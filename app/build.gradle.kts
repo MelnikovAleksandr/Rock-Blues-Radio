@@ -74,7 +74,11 @@ dependencies {
     // Coil
     implementation(libs.coil.compose)
 
-    implementation("androidx.compose.ui:ui-text-google-fonts:1.7.5")
+    // Fonts
+    implementation(libs.androidx.compose.ui.text.google.fonts)
+
+    // Gson
+    implementation(libs.gson)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
