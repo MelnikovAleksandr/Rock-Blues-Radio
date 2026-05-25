@@ -1,12 +1,11 @@
 package ru.asmelnikov.rockbluesradio.data.repository
 
 import android.content.Context
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
 import ru.asmelnikov.rockbluesradio.data.database.FavoriteRadioStationsDao
 import ru.asmelnikov.rockbluesradio.data.model.RadioStationDtoItem
 import ru.asmelnikov.rockbluesradio.data.model.map
@@ -17,9 +16,15 @@ import ru.asmelnikov.rockbluesradio.domain.repository.RadioStationRepository
 
 class RadioStationRepositoryImpl(
     private val radioStationsDao: FavoriteRadioStationsDao,
-    private val context: Context,
-    private val gson: Gson
+    private val context: Context
 ) : RadioStationRepository {
+
+    companion object {
+        private val json = Json {
+            ignoreUnknownKeys = true
+            isLenient = true
+        }
+    }
 
     override suspend fun getRadioStationsByGenre(genre: Genre): List<RadioStation> {
         return withContext(Dispatchers.IO) {
@@ -31,10 +36,7 @@ class RadioStationRepositoryImpl(
             val jsonString = context.assets.open(fileName).bufferedReader().use {
                 it.readText()
             }
-
-            val type = object : TypeToken<List<RadioStationDtoItem>>() {}.type
-            val dtoList: List<RadioStationDtoItem> = gson.fromJson(jsonString, type)
-
+            val dtoList = json.decodeFromString<List<RadioStationDtoItem>>(jsonString)
             dtoList.map { it.map(false) }
         }
     }

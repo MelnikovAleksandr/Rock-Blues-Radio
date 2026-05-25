@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
@@ -42,7 +43,6 @@ import ru.asmelnikov.rockbluesradio.presentation.player.state
 import ru.asmelnikov.rockbluesradio.presentation.player.updatePlaylist
 import ru.asmelnikov.rockbluesradio.presentation.service.rememberManagedMediaController
 import ru.asmelnikov.rockbluesradio.presentation.theme.RockBluesRadioTheme
-import kotlin.getValue
 
 @ExperimentalMaterial3Api
 class MainActivity : ComponentActivity() {
@@ -71,6 +71,15 @@ class MainActivity : ComponentActivity() {
                     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
                     val coroutineScope = rememberCoroutineScope()
                     var openBottomSheet by remember { mutableStateOf(false) }
+
+                    LaunchedEffect(mediaController) {
+                        mediaController?.let { controller ->
+                            if (controller.playWhenReady || controller.playbackState == androidx.media3.common.Player.STATE_READY) {
+                                mainViewModel.setupPlayer()
+                            }
+                        }
+                    }
+
 
                     LaunchedEffect(key1 = isPlayerSetUp) {
                         if (isPlayerSetUp) {
@@ -135,23 +144,18 @@ class MainActivity : ComponentActivity() {
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
+                            .padding(innerPadding)
                     ) {
                         NavGraph(
                             backStack = navController,
-                            paddingValues = innerPadding,
-                            onNextPage = {
+                            onItemsUpdate = {
                                 mediaController?.updatePlaylist(it.map { item -> item.toMediaItem() })
                             },
                             onRadioStationClick = { index ->
                                 mainViewModel.setupPlayer()
                                 mediaController?.playMediaAt(index)
                             },
-                            isPlayerSetUp = isPlayerSetUp,
-                            onFavoriteItemClick = { items, index ->
-                                mediaController?.updatePlaylist(items.map { item -> item.toMediaItem() })
-                                mainViewModel.setupPlayer()
-                                mediaController?.playMediaAt(index)
-                            }
+                            isPlayerSetUp = isPlayerSetUp
                         )
 
                         if (isPlayerSetUp && playerState != null) {

@@ -3,9 +3,7 @@ package ru.asmelnikov.rockbluesradio.presentation.navigation
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
@@ -21,23 +19,20 @@ import ru.asmelnikov.rockbluesradio.presentation.screens.main.HomeScreen
 @Composable
 fun NavGraph(
     backStack: NavBackStack<NavKey>,
-    paddingValues: PaddingValues,
-    onNextPage: (List<RadioStation>) -> Unit = {},
+    onItemsUpdate: (List<RadioStation>) -> Unit = {},
     onRadioStationClick: (Int) -> Unit = {},
-    onFavoriteItemClick: (List<RadioStation>, Int) -> Unit = { _, _ -> },
     isPlayerSetUp: Boolean = false
 ) {
     NavDisplay(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(paddingValues),
+            .fillMaxSize(),
         backStack = backStack,
         entryProvider = entryProvider {
             entry<Routes.MainScreen> {
                 HomeScreen(
                     navController = backStack,
                     onRadioStationClick = onRadioStationClick,
-                    onNextPage = onNextPage,
+                    onItemsUpdate = onItemsUpdate,
                     isPlayerSetUp = isPlayerSetUp
                 )
             }
@@ -45,7 +40,8 @@ fun NavGraph(
             entry<Routes.FavoritesScreen> {
                 FavoritesScreen(
                     navController = backStack,
-                    onFavoriteItemClick = onFavoriteItemClick
+                    onFavoriteItemClick = onRadioStationClick,
+                    onItemsUpdate = onItemsUpdate
                 )
             }
 

@@ -1,7 +1,6 @@
 package ru.asmelnikov.rockbluesradio.data.di
 
 import androidx.room.Room
-import com.google.gson.Gson
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 import ru.asmelnikov.rockbluesradio.data.database.AppDatabase
@@ -23,15 +22,10 @@ val dataModule = module {
         get<AppDatabase>().radioStationsDao
     }
 
-    single<Gson> {
-        Gson()
-    }
-
     single<RadioStationRepository> {
         RadioStationRepositoryImpl(
             radioStationsDao = get(),
-            context = get(),
-            gson = get()
+            context = get()
         )
     }
 }

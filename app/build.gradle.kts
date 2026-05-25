@@ -77,9 +77,7 @@ dependencies {
     // Fonts
     implementation(libs.androidx.compose.ui.text.google.fonts)
 
-    // Gson
-    implementation(libs.gson)
-
+    // Icons
     implementation(libs.androidx.compose.material.icons.extended)
 
     implementation(libs.androidx.core.ktx)

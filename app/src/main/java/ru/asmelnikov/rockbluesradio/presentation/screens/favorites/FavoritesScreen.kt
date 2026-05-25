@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,7 +29,8 @@ import ru.asmelnikov.rockbluesradio.presentation.navigation.popUp
 fun FavoritesScreen(
     viewModel: FavoritesViewModel = koinViewModel(),
     navController: NavBackStack<NavKey>,
-    onFavoriteItemClick: (List<RadioStation>, Int) -> Unit = { _, _ -> }
+    onItemsUpdate: (List<RadioStation>) -> Unit = {},
+    onFavoriteItemClick: (Int) -> Unit = {}
 ) {
     val favoriteStations by viewModel.favorites.collectAsStateWithLifecycle()
 
@@ -48,7 +50,8 @@ fun FavoritesScreen(
                     .padding(paddingValues),
                 items = favoriteStations,
                 onItemClick = { index ->
-                    onFavoriteItemClick(favoriteStations, index)
+                    onItemsUpdate(favoriteStations)
+                    onFavoriteItemClick(index)
                 },
                 onFavClick = {
                     viewModel.removeItem(it)

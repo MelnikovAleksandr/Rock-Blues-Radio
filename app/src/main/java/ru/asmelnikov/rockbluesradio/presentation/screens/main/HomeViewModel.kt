@@ -15,18 +15,37 @@ import ru.asmelnikov.rockbluesradio.domain.usecase.GetRadioStationsUseCase
 class HomeViewModel(
     private val getRadioStationsUseCase: GetRadioStationsUseCase,
     private val addToOrRemoveFromFavoritesUseCase: AddToOrRemoveFromFavoritesUseCase
-): ViewModel() {
+) : ViewModel() {
 
     private val _state = MutableStateFlow(ScreenState(isLoading = true))
     val state = _state.asStateFlow()
 
     init {
-        loadNextItems()
+        loadItems()
     }
 
-    fun loadNextItems() {
+    private fun loadItems() {
         viewModelScope.launch(Dispatchers.IO) {
-            getRadioStationsUseCase.execute(Genre.Rock)
+            _state.update { state ->
+                state.copy(isLoading = true)
+            }
+            val result = getRadioStationsUseCase.execute(Genre.Rock)
+            when {
+                result.isSuccess -> {
+                    val stations = result.getOrNull() ?: emptyList()
+                    _state.update { state ->
+                        state.copy(isLoading = false, items = stations)
+                    }
+                }
+
+                result.isFailure -> {
+                    val exception = result.exceptionOrNull()
+                    _state.update { state ->
+                        state.copy(isLoading = false, error = exception?.message)
+                    }
+                }
+            }
+
         }
     }
 
@@ -52,7 +71,5 @@ class HomeViewModel(
 data class ScreenState(
     val isLoading: Boolean = false,
     val items: List<RadioStation> = emptyList(),
-    val error: String? = null,
-    val endReached: Boolean = false,
-    val page: Int = 0
+    val error: String? = null
 )
