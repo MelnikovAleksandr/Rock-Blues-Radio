@@ -6,6 +6,7 @@ import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
 import ru.asmelnikov.rockbluesradio.data.di.dataModule
 import ru.asmelnikov.rockbluesradio.domain.di.domainModule
+import ru.asmelnikov.rockbluesradio.presentation.di.uiModule
 
 class App: Application() {
 
@@ -14,7 +15,7 @@ class App: Application() {
         startKoin {
             androidLogger()
             androidContext(this@App)
-            modules(dataModule, domainModule)
+            modules(dataModule, domainModule, uiModule)
         }
     }
 }
