@@ -1,20 +1,18 @@
 package ru.asmelnikov.rockbluesradio.presentation.screens.favorites
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavBackStack
@@ -27,6 +25,7 @@ import ru.asmelnikov.rockbluesradio.presentation.navigation.popUp
 
 @Composable
 fun FavoritesScreen(
+    isPlayerSetUp: Boolean,
     viewModel: FavoritesViewModel = koinViewModel(),
     navController: NavBackStack<NavKey>,
     onItemsUpdate: (List<RadioStation>) -> Unit = {},
@@ -34,57 +33,74 @@ fun FavoritesScreen(
 ) {
     val favoriteStations by viewModel.favorites.collectAsStateWithLifecycle()
 
-    Scaffold(
-        topBar = {
-            FavoriteTopAppBar {
-                navController.popUp()
+    LaunchedEffect(Unit) {
+        viewModel.events.collect { event ->
+            when (event) {
+                is FavoritesEvent.OnItemsUpdate -> {
+                    onItemsUpdate(favoriteStations)
+                }
             }
         }
-    ) { paddingValues ->
-
-        Box(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            RadioStationList(
-                modifier = Modifier
-                    .padding(paddingValues),
-                items = favoriteStations,
-                onItemClick = { index ->
-                    onItemsUpdate(favoriteStations)
-                    onFavoriteItemClick(index)
-                },
-                onFavClick = {
-                    viewModel.removeItem(it)
-                }
-            )
-        }
     }
+
+    RadioStationList(
+        modifier = Modifier.fillMaxSize(),
+        items = favoriteStations,
+        isPlayerSetUp = isPlayerSetUp,
+        onBackClick = {
+            navController.popUp()
+        },
+        onItemClick = { index ->
+            onItemsUpdate(favoriteStations)
+            onFavoriteItemClick(index)
+        },
+        onFavClick = {
+            viewModel.removeItem(it)
+        }
+    )
 }
 
 @Composable
 fun RadioStationList(
     modifier: Modifier = Modifier,
     items: List<RadioStation>,
+    isPlayerSetUp: Boolean,
     onItemClick: (Int) -> Unit = {},
+    onBackClick: () -> Unit = {},
     onFavClick: (RadioStation) -> Unit = {}
 ) {
     LazyColumn(
         modifier = modifier
     ) {
-        items(items = items) { item ->
+
+        stickyHeader {
+            FavoriteTopAppBar {
+                onBackClick()
+            }
+        }
+
+        items(items = items, key = { it.id }) { item ->
             RadioStationRow(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(75.dp)
-                    .background(Color.White)
-                    .padding(16.dp)
+                    .animateItem()
                     .clickable {
                         onItemClick(items.indexOf(item))
-                    },
+                    }
+                    .fillMaxWidth()
+                    .height(75.dp)
+                    .padding(16.dp),
                 item = item,
                 isFavorite = item.isFavorite,
                 onFavClick = onFavClick
             )
+        }
+        item {
+            Spacer(modifier = Modifier.navigationBarsPadding())
+        }
+        if (isPlayerSetUp) {
+            item {
+                Spacer(modifier = Modifier.height(60.dp))
+            }
         }
     }
 }

@@ -5,13 +5,23 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -32,7 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.rememberNavBackStack
 import kotlinx.coroutines.launch
-import ru.asmelnikov.rockbluesradio.data.model.toMediaItem
+import ru.asmelnikov.rockbluesradio.domain.model.toMediaItem
 import ru.asmelnikov.rockbluesradio.presentation.components.CompactPlayerView
 import ru.asmelnikov.rockbluesradio.presentation.components.ExpandedPlayerView
 import ru.asmelnikov.rockbluesradio.presentation.navigation.NavGraph
@@ -56,21 +66,22 @@ class MainActivity : ComponentActivity() {
             RockBluesRadioTheme {
                 val navController = rememberNavBackStack(Routes.MainScreen)
                 val snackbarHostState = remember { SnackbarHostState() }
+                val isPlayerSetUp by mainViewModel.isPlayerSetUp.collectAsStateWithLifecycle()
+                val mediaController by rememberManagedMediaController()
+                var playerState: PlayerState? by remember { mutableStateOf(mediaController?.state()) }
+                val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+                val coroutineScope = rememberCoroutineScope()
+                var openBottomSheet by remember { mutableStateOf(false) }
+
                 Scaffold(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.background),
+                    contentWindowInsets = WindowInsets(0.dp, 0.dp, 0.dp, 0.dp),
                     snackbarHost = {
                         SnackbarHost(snackbarHostState)
                     }
                 ) { innerPadding ->
-
-                    val isPlayerSetUp by mainViewModel.isPlayerSetUp.collectAsStateWithLifecycle()
-                    val mediaController by rememberManagedMediaController()
-                    var playerState: PlayerState? by remember {
-                        mutableStateOf(mediaController?.state())
-                    }
-                    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-                    val coroutineScope = rememberCoroutineScope()
-                    var openBottomSheet by remember { mutableStateOf(false) }
 
                     LaunchedEffect(mediaController) {
                         mediaController?.let { controller ->
@@ -79,7 +90,6 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                     }
-
 
                     LaunchedEffect(key1 = isPlayerSetUp) {
                         if (isPlayerSetUp) {
@@ -114,33 +124,44 @@ class MainActivity : ComponentActivity() {
                         }
                     }
 
-                    if (openBottomSheet && playerState != null) {
+                    if (openBottomSheet) {
                         ModalBottomSheet(
                             onDismissRequest = {
-                                openBottomSheet = false
+                                coroutineScope.launch {
+                                    sheetState.hide()
+                                }.invokeOnCompletion {
+                                    if (!sheetState.isVisible) {
+                                        openBottomSheet = false
+                                    }
+                                }
                             },
                             shape = RectangleShape,
                             sheetState = sheetState,
                         ) {
-                            ExpandedPlayerView(
-                                modifier = Modifier,
-                                playerState = playerState!!,
-                                onCollapseTap = {
-                                    coroutineScope.launch {
-                                        sheetState.hide()
-                                        openBottomSheet = false
+                            playerState?.let {
+                                ExpandedPlayerView(
+                                    modifier = Modifier,
+                                    playerState = it,
+                                    onCollapseTap = {
+                                        coroutineScope.launch {
+                                            sheetState.hide()
+                                        }.invokeOnCompletion {
+                                            if (!sheetState.isVisible) {
+                                                openBottomSheet = false
+                                            }
+                                        }
+                                    },
+                                    onPrevClick = {
+                                        mediaController?.seekToPreviousMediaItem()
+                                    },
+                                    onNextClick = {
+                                        mediaController?.seekToNextMediaItem()
                                     }
-                                },
-                                onMenuTap = {},
-                                onPrevClick = {
-                                    mediaController?.seekToPreviousMediaItem()
-                                },
-                                onNextClick = {
-                                    mediaController?.seekToNextMediaItem()
-                                }
-                            )
+                                )
+                            }
                         }
                     }
+
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
@@ -152,26 +173,36 @@ class MainActivity : ComponentActivity() {
                                 mediaController?.updatePlaylist(it.map { item -> item.toMediaItem() })
                             },
                             onRadioStationClick = { index ->
-                                mainViewModel.setupPlayer()
+                                if (!isPlayerSetUp) {
+                                    mainViewModel.setupPlayer()
+                                }
                                 mediaController?.playMediaAt(index)
                             },
                             isPlayerSetUp = isPlayerSetUp
                         )
-
-                        if (isPlayerSetUp && playerState != null) {
-                            CompactPlayerView(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(60.dp)
-                                    .align(Alignment.BottomCenter)
-                                    .clickable {
-                                        coroutineScope.launch {
-                                            sheetState.expand()
+                        AnimatedVisibility(
+                            modifier = Modifier.align(Alignment.BottomCenter).padding(8.dp).navigationBarsPadding(),
+                            visible = isPlayerSetUp && playerState != null && !openBottomSheet,
+                            enter = slideInVertically(
+                                initialOffsetY = { it },
+                                animationSpec = tween(durationMillis = 300)
+                            ) + fadeIn(),
+                            exit = slideOutVertically(
+                                targetOffsetY = { it },
+                                animationSpec = tween(durationMillis = 300)
+                            ) + fadeOut()
+                        ) {
+                            playerState?.let {
+                                CompactPlayerView(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(60.dp)
+                                        .clickable {
                                             openBottomSheet = true
-                                        }
-                                    },
-                                playerState = playerState!!
-                            )
+                                        },
+                                    playerState = it
+                                )
+                            }
                         }
                     }
                 }

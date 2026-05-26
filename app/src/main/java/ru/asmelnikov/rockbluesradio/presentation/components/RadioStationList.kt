@@ -1,15 +1,16 @@
 package ru.asmelnikov.rockbluesradio.presentation.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import ru.asmelnikov.rockbluesradio.domain.model.RadioStation
 import ru.asmelnikov.rockbluesradio.presentation.screens.main.ScreenState
@@ -18,7 +19,9 @@ import ru.asmelnikov.rockbluesradio.presentation.screens.main.ScreenState
 fun RadioStationList(
     modifier: Modifier = Modifier,
     state: ScreenState,
+    isPlayerSetUp: Boolean,
     onItemClick: (Int) -> Unit = {},
+    onFavoritesClick: () -> Unit = {},
     onFavClick: (RadioStation) -> Unit = {}
 ) {
     val scrollState = rememberLazyListState()
@@ -26,24 +29,34 @@ fun RadioStationList(
         modifier = modifier,
         state = scrollState
     ) {
-        items(
-            count = state.items.size
-        ) { index ->
 
-            state.items[index].let { item ->
-                RadioStationRow(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(75.dp)
-                        .background(Color.White)
-                        .padding(16.dp)
-                        .clickable {
-                            onItemClick(index)
-                        },
-                    item = item,
-                    isFavorite = item.isFavorite,
-                    onFavClick = onFavClick
-                )
+        stickyHeader {
+            HomeTopAppBar {
+                onFavoritesClick()
+            }
+        }
+
+        itemsIndexed(items = state.items, key = { _, it -> it.id }) { index, item ->
+            RadioStationRow(
+                modifier = Modifier
+                    .animateItem()
+                    .clickable {
+                        onItemClick(index)
+                    }
+                    .fillMaxWidth()
+                    .height(75.dp)
+                    .padding(16.dp),
+                item = item,
+                isFavorite = item.isFavorite,
+                onFavClick = onFavClick
+            )
+        }
+        item {
+            Spacer(modifier = Modifier.navigationBarsPadding())
+        }
+        if (isPlayerSetUp) {
+            item {
+                Spacer(modifier = Modifier.height(60.dp))
             }
         }
     }

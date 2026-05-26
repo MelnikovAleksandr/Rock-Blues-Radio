@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ru.asmelnikov.rockbluesradio.domain.model.Genre
@@ -24,28 +26,21 @@ class HomeViewModel(
         loadItems()
     }
 
-    private fun loadItems() {
+    fun loadItems() {
         viewModelScope.launch(Dispatchers.IO) {
-            _state.update { state ->
-                state.copy(isLoading = true)
-            }
-            val result = getRadioStationsUseCase.execute(Genre.Rock)
-            when {
-                result.isSuccess -> {
-                    val stations = result.getOrNull() ?: emptyList()
+            _state.update { it.copy(isLoading = true) }
+
+            getRadioStationsUseCase.execute(Genre.Rock)
+                .catch { exception ->
+                    _state.update { state ->
+                        state.copy(isLoading = false, error = exception.message)
+                    }
+                }
+                .collectLatest { stations ->
                     _state.update { state ->
                         state.copy(isLoading = false, items = stations)
                     }
                 }
-
-                result.isFailure -> {
-                    val exception = result.exceptionOrNull()
-                    _state.update { state ->
-                        state.copy(isLoading = false, error = exception?.message)
-                    }
-                }
-            }
-
         }
     }
 

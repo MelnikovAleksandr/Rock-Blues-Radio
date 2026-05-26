@@ -39,6 +39,7 @@ fun NavGraph(
 
             entry<Routes.FavoritesScreen> {
                 FavoritesScreen(
+                    isPlayerSetUp = isPlayerSetUp,
                     navController = backStack,
                     onFavoriteItemClick = onRadioStationClick,
                     onItemsUpdate = onItemsUpdate

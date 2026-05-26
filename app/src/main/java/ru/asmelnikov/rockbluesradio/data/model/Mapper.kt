@@ -2,8 +2,6 @@ package ru.asmelnikov.rockbluesradio.data.model
 
 import android.net.Uri
 import androidx.core.net.toUri
-import androidx.media3.common.MediaItem
-import androidx.media3.common.MediaMetadata
 import ru.asmelnikov.rockbluesradio.domain.model.RadioStation
 import java.util.Locale
 
@@ -39,20 +37,6 @@ fun RadioStation.mapToDto(): RadioStationDtoItem {
         name = name,
         tags = genres.joinToString(",")
     )
-}
-
-fun RadioStation.toMediaItem(): MediaItem {
-    val genres = genres.joinToString("|")
-    val metadata = MediaMetadata.Builder()
-        .setDisplayTitle(name.removeNonAlphanumericFirstChar())
-        .setArtworkUri(favicon)
-        .setGenre(genres)
-        .build()
-    return MediaItem.Builder()
-        .setUri(url)
-        .setMediaId(id)
-        .setMediaMetadata(metadata)
-        .build()
 }
 
 fun String.removeNonAlphanumericFirstChar(): String {

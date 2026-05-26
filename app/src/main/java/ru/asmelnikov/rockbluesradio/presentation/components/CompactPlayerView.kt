@@ -7,15 +7,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.media3.common.Player
 import ru.asmelnikov.rockbluesradio.presentation.player.PlayerState
 import ru.asmelnikov.rockbluesradio.presentation.player.isBuffering
 
@@ -28,7 +28,7 @@ fun CompactPlayerView(
         modifier = modifier,
         shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White
+            containerColor = MaterialTheme.colorScheme.primaryContainer
         )
     ) {
         Row(
@@ -54,7 +54,7 @@ fun CompactPlayerView(
                             .padding(start = 8.dp)
                             .weight(1f),
                         text = currentMediaItem.mediaMetadata.displayTitle.toString(),
-                        color = Color.Black,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -62,12 +62,17 @@ fun CompactPlayerView(
             }
             PlayPauseButton(
                 modifier = Modifier
+                    .padding(end = 24.dp)
                     .size(40.dp),
                 isPlaying = playerState.isPlaying,
-                isBuffering = playerState.isBuffering
+                isBuffering = playerState.isBuffering,
+                iconTint = MaterialTheme.colorScheme.onPrimaryContainer
             ) {
-                with(playerState.player) {
-                    playWhenReady = !playWhenReady
+                if (playerState.player.playbackState == Player.STATE_IDLE && playerState.currentMediaItem != null) {
+                    playerState.player.prepare()
+                    playerState.player.play()
+                } else {
+                    playerState.player.playWhenReady = !playerState.player.playWhenReady
                 }
             }
         }

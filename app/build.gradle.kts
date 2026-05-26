@@ -80,6 +80,9 @@ dependencies {
     // Icons
     implementation(libs.androidx.compose.material.icons.extended)
 
+    // Lottie
+    implementation(libs.lottie.compose)
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

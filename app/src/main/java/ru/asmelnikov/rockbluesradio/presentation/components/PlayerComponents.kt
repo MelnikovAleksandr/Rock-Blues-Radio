@@ -1,28 +1,46 @@
 package ru.asmelnikov.rockbluesradio.presentation.components
 
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 import android.net.Uri
-import androidx.compose.foundation.layout.Box
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Slider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.snapshotFlow
-import androidx.compose.ui.Alignment.Companion.Center
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.media3.common.Player
-import androidx.media3.ui.R
 import coil.compose.AsyncImage
+import com.airbnb.lottie.LottieProperty
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieClipSpec
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
+import com.airbnb.lottie.compose.rememberLottieDynamicProperties
+import com.airbnb.lottie.compose.rememberLottieDynamicProperty
+import ru.asmelnikov.rockbluesradio.R
+import kotlin.random.Random
 
 @Composable
 fun PlayPauseButton(
@@ -32,49 +50,78 @@ fun PlayPauseButton(
     iconTint: Color = MaterialTheme.colorScheme.onSurface,
     onTogglePlayPause: () -> Unit
 ) {
-    if (isBuffering) {
-        PlayerProgressIndicator(
-            modifier = modifier,
-            progressTint = iconTint
-        )
-    }
-    else {
-        IconButton(
-            modifier = modifier,
-            onClick = {
-                onTogglePlayPause()
-            }
-        ) {
-            Icon(
-                modifier = Modifier.fillMaxSize(fraction = .8f),
-                painter = painterResource(
-                    id = if (isPlaying)
-                        R.drawable.exo_icon_pause
-                    else
-                        R.drawable.exo_icon_play
-                ),
-                contentDescription = if (isPlaying) "Pause" else "Play",
-                tint = iconTint
-            )
-        }
-    }
-}
-
-@Composable
-fun PlayerProgressIndicator(
-    modifier: Modifier = Modifier,
-    progressTint: Color = MaterialTheme.colorScheme.onSurface
-) {
-    Box(
-        modifier = modifier
+    IconButton(
+        modifier = modifier,
+        onClick = onTogglePlayPause
     ) {
-        CircularProgressIndicator(
-            modifier = Modifier
-                .fillMaxSize(.8f)
-                .align(Center),
-            color = progressTint,
-            trackColor = Color.Transparent
-        )
+        AnimatedContent(
+            targetState = isBuffering,
+            transitionSpec = {
+                fadeIn() togetherWith fadeOut()
+            }
+        ) { isBufferingState ->
+            if (isBufferingState) {
+                val composition by rememberLottieComposition(
+                    LottieCompositionSpec.RawRes(R.raw.loading_circle)
+                )
+
+                val dynamicProperties = rememberLottieDynamicProperties(
+                    rememberLottieDynamicProperty(
+                        property = LottieProperty.COLOR_FILTER,
+                        value = PorterDuffColorFilter(iconTint.toArgb(), PorterDuff.Mode.SRC_ATOP),
+                        keyPath = arrayOf("**")
+                    )
+                )
+
+                val progress by animateLottieCompositionAsState(
+                    composition = composition,
+                    iterations = LottieConstants.IterateForever,
+                    isPlaying = true,
+                    speed = 1f
+                )
+
+                LottieAnimation(
+                    composition = composition,
+                    progress = { progress },
+                    dynamicProperties = dynamicProperties
+                )
+            } else {
+                key(isPlaying) {
+                    val composition by rememberLottieComposition(
+                        LottieCompositionSpec.RawRes(R.raw.pause_play)
+                    )
+
+                    val dynamicProperties = rememberLottieDynamicProperties(
+                        rememberLottieDynamicProperty(
+                            property = LottieProperty.COLOR_FILTER,
+                            value = PorterDuffColorFilter(iconTint.toArgb(), PorterDuff.Mode.SRC_ATOP),
+                            keyPath = arrayOf("**")
+                        )
+                    )
+
+                    val clipSpec = if (isPlaying) {
+                        LottieClipSpec.Frame(0, 37)
+                    } else {
+                        LottieClipSpec.Frame(38, 67)
+                    }
+
+                    val progress by animateLottieCompositionAsState(
+                        composition = composition,
+                        iterations = 1,
+                        isPlaying = true,
+                        speed = 1f,
+                        clipSpec = clipSpec,
+                        restartOnPlay = true
+                    )
+
+                    LottieAnimation(
+                        composition = composition,
+                        progress = { progress },
+                        dynamicProperties = dynamicProperties
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -85,39 +132,31 @@ fun MiniPlayerArtworkView(
 ) {
     Card(
         modifier = modifier,
-        shape = RoundedCornerShape(4.dp)
+        shape = RoundedCornerShape(8.dp)
     ) {
+        val placeholderPainter = painterResource(id = R.drawable.radio)
+        val backgroundColor = remember(artworkUri) {
+            val seed = artworkUri.hashCode()
+            val random = Random(seed)
+            Color.hsl(
+                hue = random.nextFloat() * 360f,
+                saturation = 0.5f,
+                lightness = 0.8f,
+                alpha = 1f
+            )
+        }
         AsyncImage(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    color = backgroundColor
+                ),
             model = artworkUri,
             contentDescription = null,
+            placeholder = placeholderPainter,
+            error = placeholderPainter
         )
     }
-}
-
-@Composable
-fun TimeBar(
-    modifier: Modifier = Modifier,
-    player: Player
-) {
-    val currentPosition = remember { mutableLongStateOf(0L) }
-    val duration = remember { mutableLongStateOf(0L) }
-    LaunchedEffect(player) {
-        snapshotFlow { player.currentPosition }
-            .collect { currentPosition.longValue = it }
-
-        snapshotFlow { player.duration }
-            .collect { duration.longValue = it }
-    }
-
-    Slider(
-        modifier = modifier,
-        value = currentPosition.longValue.toFloat(),
-        onValueChange = {
-
-        },
-        valueRange = 0f..duration.longValue.toFloat()
-    )
 }
 
 @Composable
@@ -126,15 +165,49 @@ fun PreviousButton(
     iconTint: Color = MaterialTheme.colorScheme.onSurface,
     onClick: () -> Unit
 ) {
+    val composition by rememberLottieComposition(
+        LottieCompositionSpec.RawRes(R.raw.next_track)
+    )
+
+    val dynamicProperties = rememberLottieDynamicProperties(
+        rememberLottieDynamicProperty(
+            property = LottieProperty.COLOR_FILTER,
+            value = PorterDuffColorFilter(iconTint.toArgb(), PorterDuff.Mode.SRC_ATOP),
+            keyPath = arrayOf("**")
+        )
+    )
+
+    var shouldAnimate by remember { mutableStateOf(false) }
+
+    val progress by animateLottieCompositionAsState(
+        composition = composition,
+        iterations = 1,
+        isPlaying = shouldAnimate,
+        speed = 1f,
+        restartOnPlay = true
+    )
+
+    LaunchedEffect(progress) {
+        if (progress >= 0.99f && shouldAnimate) {
+            shouldAnimate = false
+        }
+    }
+
     IconButton(
         modifier = modifier,
-        onClick = onClick
+        onClick = {
+            shouldAnimate = true
+            onClick()
+        }
     ) {
-        Icon(
-            modifier = Modifier.fillMaxSize(fraction = .8f),
-            painter = painterResource(R.drawable.exo_icon_previous),
-            contentDescription = "Previous",
-            tint = iconTint
+        LottieAnimation(
+            modifier = Modifier
+                .graphicsLayer {
+                    rotationZ = 180f
+                },
+            composition = composition,
+            progress = { progress },
+            dynamicProperties = dynamicProperties
         )
     }
 }
@@ -145,15 +218,45 @@ fun NextButton(
     iconTint: Color = MaterialTheme.colorScheme.onSurface,
     onClick: () -> Unit
 ) {
+    val composition by rememberLottieComposition(
+        LottieCompositionSpec.RawRes(R.raw.next_track)
+    )
+
+    val dynamicProperties = rememberLottieDynamicProperties(
+        rememberLottieDynamicProperty(
+            property = LottieProperty.COLOR_FILTER,
+            value = PorterDuffColorFilter(iconTint.toArgb(), PorterDuff.Mode.SRC_ATOP),
+            keyPath = arrayOf("**")
+        )
+    )
+
+    var shouldAnimate by remember { mutableStateOf(false) }
+
+    val progress by animateLottieCompositionAsState(
+        composition = composition,
+        iterations = 1,
+        isPlaying = shouldAnimate,
+        speed = 1f,
+        restartOnPlay = true
+    )
+
+    LaunchedEffect(progress) {
+        if (progress >= 0.99f && shouldAnimate) {
+            shouldAnimate = false
+        }
+    }
+
     IconButton(
         modifier = modifier,
-        onClick = onClick
+        onClick = {
+            shouldAnimate = true
+            onClick()
+        }
     ) {
-        Icon(
-            modifier = Modifier.fillMaxSize(fraction = .8f),
-            painter = painterResource(R.drawable.exo_icon_next),
-            contentDescription = "Previous",
-            tint = iconTint
+        LottieAnimation(
+            composition = composition,
+            progress = { progress },
+            dynamicProperties = dynamicProperties
         )
     }
 }
