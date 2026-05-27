@@ -8,11 +8,11 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.airbnb.lottie.LottieProperty
@@ -40,6 +41,7 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.airbnb.lottie.compose.rememberLottieDynamicProperties
 import com.airbnb.lottie.compose.rememberLottieDynamicProperty
 import ru.asmelnikov.rockbluesradio.R
+import ru.asmelnikov.rockbluesradio.presentation.theme.RockBluesRadioTheme
 import kotlin.random.Random
 
 @Composable
@@ -94,7 +96,10 @@ fun PlayPauseButton(
                     val dynamicProperties = rememberLottieDynamicProperties(
                         rememberLottieDynamicProperty(
                             property = LottieProperty.COLOR_FILTER,
-                            value = PorterDuffColorFilter(iconTint.toArgb(), PorterDuff.Mode.SRC_ATOP),
+                            value = PorterDuffColorFilter(
+                                iconTint.toArgb(),
+                                PorterDuff.Mode.SRC_ATOP
+                            ),
                             keyPath = arrayOf("**")
                         )
                     )
@@ -132,7 +137,7 @@ fun MiniPlayerArtworkView(
 ) {
     Card(
         modifier = modifier,
-        shape = RoundedCornerShape(8.dp)
+        shape = MaterialTheme.shapes.medium
     ) {
         val placeholderPainter = painterResource(id = R.drawable.radio)
         val backgroundColor = remember(artworkUri) {
@@ -258,5 +263,94 @@ fun NextButton(
             progress = { progress },
             dynamicProperties = dynamicProperties
         )
+    }
+}
+
+@Preview
+@Composable
+fun PlayPauseButtonPreview1(modifier: Modifier = Modifier) {
+    RockBluesRadioTheme(darkTheme = true) {
+        Box(
+            modifier = modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.background)
+        ) {
+            PlayPauseButton(
+                modifier = Modifier.padding(24.dp),
+                isPlaying = false,
+                isBuffering = false,
+                onTogglePlayPause = {}
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+fun PlayPauseButtonPreview2(modifier: Modifier = Modifier) {
+    RockBluesRadioTheme {
+        Box(
+            modifier = modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.background)
+        ) {
+            PlayPauseButton(
+                modifier = Modifier.padding(24.dp),
+                isPlaying = false,
+                isBuffering = false,
+                onTogglePlayPause = {}
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+fun MiniPlayerArtworkViewPreview1(modifier: Modifier = Modifier) {
+    RockBluesRadioTheme(darkTheme = true) {
+        Box(
+            modifier = modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.background)
+        ) {
+            MiniPlayerArtworkView(
+                modifier = Modifier
+                    .padding(24.dp)
+                    .aspectRatio(1f),
+                artworkUri = Uri.EMPTY
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+fun PreviousButtonPreview1(modifier: Modifier = Modifier) {
+    RockBluesRadioTheme(darkTheme = true) {
+        Box(
+            modifier = modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.background)
+        ) {
+            PreviousButton(
+                onClick = {}
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+fun NextButtonPreview1(modifier: Modifier = Modifier) {
+    RockBluesRadioTheme {
+        Box(
+            modifier = modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.background)
+        ) {
+            NextButton(
+                onClick = {}
+            )
+        }
     }
 }

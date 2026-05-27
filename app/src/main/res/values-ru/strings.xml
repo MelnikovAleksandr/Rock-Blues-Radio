@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="radio_stations">Радио станции</string>
+    <string name="favorite_stations">Избранные станции</string>
+</resources>

@@ -12,6 +12,7 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import dev.chrisbanes.haze.HazeState
 import ru.asmelnikov.rockbluesradio.domain.model.RadioStation
 import ru.asmelnikov.rockbluesradio.presentation.screens.favorites.FavoritesScreen
 import ru.asmelnikov.rockbluesradio.presentation.screens.main.HomeScreen
@@ -21,7 +22,8 @@ fun NavGraph(
     backStack: NavBackStack<NavKey>,
     onItemsUpdate: (List<RadioStation>) -> Unit = {},
     onRadioStationClick: (Int) -> Unit = {},
-    isPlayerSetUp: Boolean = false
+    isPlayerSetUp: Boolean = false,
+    hazeState: HazeState
 ) {
     NavDisplay(
         modifier = Modifier
@@ -33,7 +35,8 @@ fun NavGraph(
                     navController = backStack,
                     onRadioStationClick = onRadioStationClick,
                     onItemsUpdate = onItemsUpdate,
-                    isPlayerSetUp = isPlayerSetUp
+                    isPlayerSetUp = isPlayerSetUp,
+                    hazeState = hazeState
                 )
             }
 
@@ -42,7 +45,8 @@ fun NavGraph(
                     isPlayerSetUp = isPlayerSetUp,
                     navController = backStack,
                     onFavoriteItemClick = onRadioStationClick,
-                    onItemsUpdate = onItemsUpdate
+                    onItemsUpdate = onItemsUpdate,
+                    hazeState = hazeState
                 )
             }
 

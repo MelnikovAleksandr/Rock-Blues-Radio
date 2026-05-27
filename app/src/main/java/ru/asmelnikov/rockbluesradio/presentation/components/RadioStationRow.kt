@@ -1,13 +1,15 @@
 package ru.asmelnikov.rockbluesradio.presentation.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -19,10 +21,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
 import coil.compose.AsyncImage
 import ru.asmelnikov.rockbluesradio.R
 import ru.asmelnikov.rockbluesradio.domain.model.RadioStation
+import ru.asmelnikov.rockbluesradio.presentation.theme.RockBluesRadioTheme
+import ru.asmelnikov.rockbluesradio.presentation.theme.dimens
+import ru.asmelnikov.rockbluesradio.presentation.utils.navigationBarsAndCutoutPaddingIfLandscape
 import kotlin.random.Random
 
 @Composable
@@ -32,15 +37,16 @@ fun RadioStationRow(
     isFavorite: Boolean,
     onFavClick: (RadioStation) -> Unit
 ) {
+
     Row(
-        modifier = modifier,
+        modifier = modifier.navigationBarsAndCutoutPaddingIfLandscape(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Row(
             modifier = Modifier
                 .weight(1f)
-                .padding(end = 8.dp),
+                .padding(end = dimens.small1),
             verticalAlignment = Alignment.CenterVertically
         ) {
 
@@ -56,8 +62,11 @@ fun RadioStationRow(
             }
 
             Card(
-                modifier = Modifier.fillMaxWidth(fraction = 0.2f).aspectRatio(1f).padding(8.dp),
-                shape = RoundedCornerShape(8.dp),
+                modifier = Modifier
+                    .size(dimens.large)
+                    .aspectRatio(1f)
+                    .padding(dimens.small1),
+                shape = MaterialTheme.shapes.medium,
                 colors = CardDefaults.cardColors(
                     containerColor = backgroundColor
                 )
@@ -76,7 +85,7 @@ fun RadioStationRow(
 
             Column(
                 modifier = Modifier
-                    .padding(start = 8.dp)
+                    .padding(start = dimens.small1)
                     .weight(1f),
                 horizontalAlignment = Alignment.Start,
                 verticalArrangement = Arrangement.Center
@@ -99,10 +108,52 @@ fun RadioStationRow(
             }
         }
         FavoriteButton(
+            modifier = Modifier
+                .padding(end = dimens.extraSmall1)
+                .size(dimens.medium4),
             isFavorite = isFavorite,
             itemId = item.id,
-            iconTint = MaterialTheme.colorScheme.primary,
             onFavClick = { onFavClick(item) }
         )
+    }
+}
+
+@Preview
+@Preview(device = "id:pixel_tablet")
+@Composable
+fun RadioStationRowPreview1(modifier: Modifier = Modifier) {
+    RockBluesRadioTheme(darkTheme = true) {
+        Box(
+            modifier = modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.background)
+        ) {
+            RadioStationRow(
+                modifier = Modifier,
+                item = mockRadioStation(),
+                isFavorite = false,
+                onFavClick = {}
+            )
+        }
+    }
+}
+
+@Preview
+@Preview(device = "id:pixel_tablet")
+@Composable
+fun RadioStationRowPreview2(modifier: Modifier = Modifier) {
+    RockBluesRadioTheme {
+        Box(
+            modifier = modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.background)
+        ) {
+            RadioStationRow(
+                modifier = Modifier,
+                item = mockRadioStation(),
+                isFavorite = true,
+                onFavClick = {}
+            )
+        }
     }
 }

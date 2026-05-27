@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -40,7 +39,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.media3.common.Player
 import androidx.navigation3.runtime.rememberNavBackStack
+import dev.chrisbanes.haze.rememberHazeState
 import kotlinx.coroutines.launch
 import ru.asmelnikov.rockbluesradio.domain.model.toMediaItem
 import ru.asmelnikov.rockbluesradio.presentation.components.CompactPlayerView
@@ -48,6 +49,7 @@ import ru.asmelnikov.rockbluesradio.presentation.components.ExpandedPlayerView
 import ru.asmelnikov.rockbluesradio.presentation.navigation.NavGraph
 import ru.asmelnikov.rockbluesradio.presentation.navigation.Routes
 import ru.asmelnikov.rockbluesradio.presentation.player.PlayerState
+import ru.asmelnikov.rockbluesradio.presentation.player.isBuffering
 import ru.asmelnikov.rockbluesradio.presentation.player.playMediaAt
 import ru.asmelnikov.rockbluesradio.presentation.player.state
 import ru.asmelnikov.rockbluesradio.presentation.player.updatePlaylist
@@ -72,7 +74,7 @@ class MainActivity : ComponentActivity() {
                 val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
                 val coroutineScope = rememberCoroutineScope()
                 var openBottomSheet by remember { mutableStateOf(false) }
-
+                val hazeState = rememberHazeState()
                 Scaffold(
                     modifier = Modifier
                         .fillMaxSize()
@@ -85,7 +87,7 @@ class MainActivity : ComponentActivity() {
 
                     LaunchedEffect(mediaController) {
                         mediaController?.let { controller ->
-                            if (controller.playWhenReady || controller.playbackState == androidx.media3.common.Player.STATE_READY) {
+                            if (controller.playWhenReady || controller.playbackState == Player.STATE_READY) {
                                 mainViewModel.setupPlayer()
                             }
                         }
@@ -178,10 +180,14 @@ class MainActivity : ComponentActivity() {
                                 }
                                 mediaController?.playMediaAt(index)
                             },
-                            isPlayerSetUp = isPlayerSetUp
+                            isPlayerSetUp = isPlayerSetUp,
+                            hazeState = hazeState
                         )
                         AnimatedVisibility(
-                            modifier = Modifier.align(Alignment.BottomCenter).padding(8.dp).navigationBarsPadding(),
+                            modifier = Modifier
+                                .align(Alignment.BottomCenter)
+                                .padding(8.dp)
+                                .navigationBarsPadding(),
                             visible = isPlayerSetUp && playerState != null && !openBottomSheet,
                             enter = slideInVertically(
                                 initialOffsetY = { it },
@@ -192,15 +198,25 @@ class MainActivity : ComponentActivity() {
                                 animationSpec = tween(durationMillis = 300)
                             ) + fadeOut()
                         ) {
-                            playerState?.let {
+                            playerState?.let { safeState ->
                                 CompactPlayerView(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .height(60.dp)
                                         .clickable {
                                             openBottomSheet = true
                                         },
-                                    playerState = it
+                                    currentMediaItem = safeState.currentMediaItem,
+                                    isBuffering = safeState.isBuffering,
+                                    isPlaying = safeState.isPlaying,
+                                    hazeState = hazeState,
+                                    onPlayPauseClick = {
+                                        if (safeState.player.playbackState == Player.STATE_IDLE && safeState.currentMediaItem != null) {
+                                            safeState.player.prepare()
+                                            safeState.player.play()
+                                        } else {
+                                            safeState.player.playWhenReady = !safeState.player.playWhenReady
+                                        }
+                                    }
                                 )
                             }
                         }

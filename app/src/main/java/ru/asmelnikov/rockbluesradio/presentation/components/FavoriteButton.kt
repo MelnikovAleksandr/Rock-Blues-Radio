@@ -2,8 +2,12 @@ package ru.asmelnikov.rockbluesradio.presentation.components
 
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -15,6 +19,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.tooling.preview.Preview
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieClipSpec
@@ -24,13 +29,14 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.airbnb.lottie.compose.rememberLottieDynamicProperties
 import com.airbnb.lottie.compose.rememberLottieDynamicProperty
 import ru.asmelnikov.rockbluesradio.R
+import ru.asmelnikov.rockbluesradio.presentation.theme.RockBluesRadioTheme
 
 @Composable
 fun FavoriteButton(
     modifier: Modifier = Modifier,
     isFavorite: Boolean,
     itemId: String,
-    iconTint: Color = Color.Unspecified,
+    iconTint: Color = MaterialTheme.colorScheme.primary,
     onFavClick: () -> Unit
 ) {
     var animationKey by remember(itemId) { mutableIntStateOf(0) }
@@ -95,6 +101,42 @@ fun FavoriteButton(
                     else 0f
                 },
                 dynamicProperties = dynamicProperties
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+fun FavoriteButtonPreview1(modifier: Modifier = Modifier) {
+    RockBluesRadioTheme(darkTheme = true) {
+        Box(
+            modifier = modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.background)
+        ) {
+            FavoriteButton(
+                isFavorite = true,
+                itemId = "123",
+                onFavClick = {}
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+fun FavoriteButtonPreview2(modifier: Modifier = Modifier) {
+    RockBluesRadioTheme {
+        Box(
+            modifier = modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.background)
+        ) {
+            FavoriteButton(
+                isFavorite = false,
+                itemId = "123",
+                onFavClick = {}
             )
         }
     }
