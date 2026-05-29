@@ -1,3 +1,7 @@
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
@@ -7,6 +11,22 @@ plugins {
 }
 
 android {
+
+    signingConfigs {
+        create("release") {
+            val p = Properties()
+            p.load(project.rootProject.file("local.properties").reader())
+            val file: String = p.getProperty("storeFile")
+            val alias: String = p.getProperty("keyAlias")
+            val storePas: String = p.getProperty("storePassword")
+            val keyPas: String = p.getProperty("keyPassword")
+            storeFile = file("\"$file\"")
+            storePassword = "\"$storePas\""
+            keyAlias = "\"$alias\""
+            keyPassword = "\"$keyPas\""
+        }
+    }
+
     namespace = "ru.asmelnikov.rockbluesradio"
     compileSdk = 37
 
@@ -22,7 +42,7 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -35,6 +55,23 @@ android {
     }
     buildFeatures {
         compose = true
+    }
+}
+
+androidComponents {
+    onVariants(selector().all()) { variant ->
+        variant.outputs.forEach { output ->
+            if (output is com.android.build.api.variant.impl.VariantOutputImpl) {
+                val baseName = "Rock&BluesRadio"
+                val buildType = variant.buildType.orEmpty()
+                val fileName = "${baseName}-${buildType}-" +
+                        "v${android.defaultConfig.versionName}-" +
+                        "vc${android.defaultConfig.versionCode}-" +
+                        "${getDateTimeFormat()}.apk"
+
+                output.outputFileName.set(fileName)
+            }
+        }
     }
 }
 
@@ -99,4 +136,9 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+}
+
+fun getDateTimeFormat(): String {
+    val simpleDateFormat = SimpleDateFormat("ddMMyy")
+    return simpleDateFormat.format(Date())
 }
