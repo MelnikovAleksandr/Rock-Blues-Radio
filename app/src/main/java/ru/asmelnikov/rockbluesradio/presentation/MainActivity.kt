@@ -33,11 +33,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.media3.common.Player
 import androidx.navigation3.runtime.rememberNavBackStack
@@ -45,7 +48,7 @@ import dev.chrisbanes.haze.rememberHazeState
 import kotlinx.coroutines.launch
 import ru.asmelnikov.rockbluesradio.domain.model.toMediaItem
 import ru.asmelnikov.rockbluesradio.presentation.components.CompactPlayerView
-import ru.asmelnikov.rockbluesradio.presentation.components.ExpandedPlayerView
+import ru.asmelnikov.rockbluesradio.presentation.components.expanded.ExpandedPlayerView
 import ru.asmelnikov.rockbluesradio.presentation.navigation.NavGraph
 import ru.asmelnikov.rockbluesradio.presentation.navigation.Routes
 import ru.asmelnikov.rockbluesradio.presentation.player.PlayerState
@@ -55,6 +58,7 @@ import ru.asmelnikov.rockbluesradio.presentation.player.state
 import ru.asmelnikov.rockbluesradio.presentation.player.updatePlaylist
 import ru.asmelnikov.rockbluesradio.presentation.service.rememberManagedMediaController
 import ru.asmelnikov.rockbluesradio.presentation.theme.RockBluesRadioTheme
+import ru.asmelnikov.rockbluesradio.presentation.theme.dimens
 
 @ExperimentalMaterial3Api
 class MainActivity : ComponentActivity() {
@@ -64,6 +68,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        installSplashScreen()
         setContent {
             RockBluesRadioTheme {
                 val navController = rememberNavBackStack(Routes.MainScreen)
@@ -73,7 +78,7 @@ class MainActivity : ComponentActivity() {
                 var playerState: PlayerState? by remember { mutableStateOf(mediaController?.state()) }
                 val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
                 val coroutineScope = rememberCoroutineScope()
-                var openBottomSheet by remember { mutableStateOf(false) }
+                var openBottomSheet by rememberSaveable { mutableStateOf(false) }
                 val hazeState = rememberHazeState()
                 Scaffold(
                     modifier = Modifier
@@ -139,6 +144,9 @@ class MainActivity : ComponentActivity() {
                             },
                             shape = RectangleShape,
                             sheetState = sheetState,
+                            contentWindowInsets = { WindowInsets(0) },
+                            dragHandle = null,
+                            sheetMaxWidth = Dp.Unspecified
                         ) {
                             playerState?.let {
                                 ExpandedPlayerView(
@@ -181,14 +189,16 @@ class MainActivity : ComponentActivity() {
                                 mediaController?.playMediaAt(index)
                             },
                             isPlayerSetUp = isPlayerSetUp,
-                            hazeState = hazeState
+                            hazeState = hazeState,
+                            currentPlayingStationId = playerState?.takeIf { it.isPlaying }?.currentMediaItem?.mediaId
+                                ?: ""
                         )
                         AnimatedVisibility(
                             modifier = Modifier
                                 .align(Alignment.BottomCenter)
-                                .padding(8.dp)
+                                .padding(dimens.extraSmall2)
                                 .navigationBarsPadding(),
-                            visible = isPlayerSetUp && playerState != null && !openBottomSheet,
+                            visible = isPlayerSetUp && playerState != null && !openBottomSheet && playerState?.currentMediaItem != null,
                             enter = slideInVertically(
                                 initialOffsetY = { it },
                                 animationSpec = tween(durationMillis = 300)
@@ -214,7 +224,8 @@ class MainActivity : ComponentActivity() {
                                             safeState.player.prepare()
                                             safeState.player.play()
                                         } else {
-                                            safeState.player.playWhenReady = !safeState.player.playWhenReady
+                                            safeState.player.playWhenReady =
+                                                !safeState.player.playWhenReady
                                         }
                                     }
                                 )

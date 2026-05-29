@@ -19,7 +19,8 @@ fun HomeScreen(
     onRadioStationClick: (Int) -> Unit = {},
     onItemsUpdate: (List<RadioStation>) -> Unit = {},
     isPlayerSetUp: Boolean = false,
-    hazeState: HazeState
+    hazeState: HazeState,
+    currentPlayingStationId: String
 ) {
 
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -27,6 +28,7 @@ fun HomeScreen(
     RadioStationList(
         state = state,
         hazeState = hazeState,
+        currentPlayingStationId = currentPlayingStationId,
         isPlayerSetUp = isPlayerSetUp,
         onFavoritesClick = {
             navController.navigate(Routes.FavoritesScreen)
@@ -37,6 +39,9 @@ fun HomeScreen(
         },
         onFavClick = {
             viewModel.addOrRemoteFavorites(it)
+        },
+        onGenreClick = {
+            viewModel.onGenreClick()
         }
     )
 }

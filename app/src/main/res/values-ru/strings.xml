@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="radio_stations">Радио станции</string>
+    <string name="rock_stations">Рок станции</string>
+    <string name="blues_stations">Блюз станции</string>
     <string name="favorite_stations">Избранные станции</string>
 </resources>

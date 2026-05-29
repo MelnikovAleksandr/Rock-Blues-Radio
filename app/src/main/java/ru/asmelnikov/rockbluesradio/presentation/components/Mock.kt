@@ -39,3 +39,16 @@ fun mockRadioStations(): List<RadioStation> = listOf(
     mockRadioStation().copy(id = UUID.randomUUID().toString()),
     mockRadioStation().copy(id = UUID.randomUUID().toString())
 )
+
+fun mockMediaItems(): List<MediaItem> = listOf(
+    mockMediaItem(),
+    mockMediaItem(),
+    mockMediaItem(),
+    mockMediaItem(),
+    mockMediaItem(),
+    mockMediaItem(),
+    mockMediaItem(),
+    mockMediaItem(),
+    mockMediaItem(),
+    mockMediaItem()
+)

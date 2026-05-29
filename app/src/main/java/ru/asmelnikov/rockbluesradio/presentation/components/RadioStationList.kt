@@ -26,10 +26,12 @@ import ru.asmelnikov.rockbluesradio.presentation.theme.RockBluesRadioTheme
 fun RadioStationList(
     modifier: Modifier = Modifier,
     state: ScreenState,
+    currentPlayingStationId: String,
     hazeState: HazeState,
     isPlayerSetUp: Boolean,
     onItemClick: (Int) -> Unit = {},
     onFavoritesClick: () -> Unit = {},
+    onGenreClick: () -> Unit = {},
     onFavClick: (RadioStation) -> Unit = {}
 ) {
     Box(modifier = modifier.fillMaxSize()) {
@@ -47,7 +49,10 @@ fun RadioStationList(
 
             stickyHeader {
                 HomeTopAppBar(
+                    genre = state.genre,
+                    favoritesEnabled = state.showFavoritesButton,
                     hazeState = hazeState,
+                    onGenreClick = onGenreClick
                 ) {
                     onFavoritesClick()
                 }
@@ -63,6 +68,7 @@ fun RadioStationList(
                         }
                         .fillMaxWidth(),
                     item = item,
+                    currentPlayingStationId = currentPlayingStationId,
                     isFavorite = item.isFavorite,
                     onFavClick = onFavClick
                 )
@@ -94,6 +100,7 @@ fun RadioStationListPreview1(modifier: Modifier = Modifier) {
                     items = mockRadioStations(),
                 ),
                 hazeState = rememberHazeState(),
+                currentPlayingStationId = "",
                 isPlayerSetUp = false,
                 onItemClick = {},
                 onFavoritesClick = {},
@@ -118,6 +125,7 @@ fun RadioStationListPreview2(modifier: Modifier = Modifier) {
                     items = mockRadioStations(),
                 ),
                 hazeState = rememberHazeState(),
+                currentPlayingStationId = "",
                 isPlayerSetUp = false,
                 onItemClick = {},
                 onFavoritesClick = {},

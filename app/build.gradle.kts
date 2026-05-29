@@ -39,12 +39,7 @@ android {
 }
 
 dependencies {
-    // orbit
-    implementation(libs.orbit.core)
-    implementation(libs.orbit.viewmodel)
-    implementation(libs.orbit.compose)
-
-    // navigation
+    // Navigation
     implementation(libs.androidx.navigation3.ui)
     implementation(libs.androidx.navigation3.runtime)
     implementation(libs.androidx.lifecycle.viewmodel.navigation3)
@@ -85,6 +80,9 @@ dependencies {
 
     // Haze
     implementation(libs.haze)
+
+    // splash
+    implementation(libs.core.splashscreen)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

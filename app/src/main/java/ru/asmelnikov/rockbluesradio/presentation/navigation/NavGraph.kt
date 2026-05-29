@@ -23,7 +23,8 @@ fun NavGraph(
     onItemsUpdate: (List<RadioStation>) -> Unit = {},
     onRadioStationClick: (Int) -> Unit = {},
     isPlayerSetUp: Boolean = false,
-    hazeState: HazeState
+    hazeState: HazeState,
+    currentPlayingStationId: String
 ) {
     NavDisplay(
         modifier = Modifier
@@ -36,7 +37,8 @@ fun NavGraph(
                     onRadioStationClick = onRadioStationClick,
                     onItemsUpdate = onItemsUpdate,
                     isPlayerSetUp = isPlayerSetUp,
-                    hazeState = hazeState
+                    hazeState = hazeState,
+                    currentPlayingStationId = currentPlayingStationId
                 )
             }
 
@@ -46,7 +48,8 @@ fun NavGraph(
                     navController = backStack,
                     onFavoriteItemClick = onRadioStationClick,
                     onItemsUpdate = onItemsUpdate,
-                    hazeState = hazeState
+                    hazeState = hazeState,
+                    currentPlayingStationId = currentPlayingStationId
                 )
             }
 

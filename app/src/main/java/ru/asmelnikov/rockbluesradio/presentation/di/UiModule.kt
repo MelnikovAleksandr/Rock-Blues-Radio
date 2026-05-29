@@ -8,6 +8,6 @@ import ru.asmelnikov.rockbluesradio.presentation.screens.main.HomeViewModel
 
 val uiModule = module {
     viewModel { MainViewModel() }
-    viewModel { HomeViewModel(get(), get()) }
+    viewModel { HomeViewModel(get(), get(), get()) }
     viewModel { FavoritesViewModel(get(), get()) }
 }

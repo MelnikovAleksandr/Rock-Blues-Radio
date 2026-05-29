@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name" translatable="false">Rock&amp;Blues Radio</string>
 
-    <string name="radio_stations">Radio Stations</string>
+    <string name="rock_stations">Rock Stations</string>
+    <string name="blues_stations">Blues Stations</string>
     <string name="favorite_stations">Favorite Stations</string>
 </resources>

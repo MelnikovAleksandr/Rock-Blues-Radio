@@ -28,18 +28,24 @@ fun Player.updatePlaylist(incoming: List<MediaItem>) {
 }
 
 fun Player.playMediaAt(index: Int) {
-    if (currentMediaItemIndex == index && (playbackState == Player.STATE_READY || playbackState == Player.STATE_BUFFERING)) {
-        if (!playWhenReady) {
-            play()
+    if (currentMediaItemIndex == index) {
+        when (playbackState) {
+            Player.STATE_READY, Player.STATE_BUFFERING -> {
+                playWhenReady = !playWhenReady
+                return
+            }
+
+            Player.STATE_ENDED -> {
+                seekToDefaultPosition(index)
+                playWhenReady = true
+                prepare()
+                return
+            }
+
+            Player.STATE_IDLE -> {}
         }
-        return
     }
-    if (currentMediaItemIndex == index && playbackState == Player.STATE_ENDED) {
-        seekToDefaultPosition(index)
-        playWhenReady = true
-        prepare()
-        return
-    }
+
     seekToDefaultPosition(index)
     playWhenReady = true
     prepare()

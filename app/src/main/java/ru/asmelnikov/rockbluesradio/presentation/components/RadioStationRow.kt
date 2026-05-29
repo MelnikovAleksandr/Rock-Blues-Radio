@@ -1,5 +1,8 @@
 package ru.asmelnikov.rockbluesradio.presentation.components
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,6 +18,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,6 +27,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import coil.compose.AsyncImage
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.rememberLottieComposition
 import ru.asmelnikov.rockbluesradio.R
 import ru.asmelnikov.rockbluesradio.domain.model.RadioStation
 import ru.asmelnikov.rockbluesradio.presentation.theme.RockBluesRadioTheme
@@ -34,6 +42,7 @@ import kotlin.random.Random
 fun RadioStationRow(
     modifier: Modifier = Modifier,
     item: RadioStation,
+    currentPlayingStationId: String,
     isFavorite: Boolean,
     onFavClick: (RadioStation) -> Unit
 ) {
@@ -71,16 +80,32 @@ fun RadioStationRow(
                     containerColor = backgroundColor
                 )
             ) {
-                val placeholderPainter = painterResource(id = R.drawable.radio)
+                Box {
+                    val placeholderPainter = painterResource(id = R.drawable.radio)
 
-                AsyncImage(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    model = item.favicon,
-                    contentDescription = null,
-                    placeholder = placeholderPainter,
-                    error = placeholderPainter
-                )
+                    AsyncImage(
+                        modifier = Modifier.fillMaxSize(),
+                        model = item.favicon,
+                        contentDescription = null,
+                        placeholder = placeholderPainter,
+                        error = placeholderPainter
+                    )
+
+                    this@Card.AnimatedVisibility(
+                        visible = item.id == currentPlayingStationId,
+                        enter = fadeIn(),
+                        exit = fadeOut()
+                    ) {
+                        val composition by rememberLottieComposition(
+                            LottieCompositionSpec.RawRes(R.raw.playing)
+                        )
+                        LottieAnimation(
+                            modifier = Modifier.fillMaxSize(),
+                            composition = composition,
+                            iterations = LottieConstants.IterateForever
+                        )
+                    }
+                }
             }
 
             Column(
@@ -131,6 +156,7 @@ fun RadioStationRowPreview1(modifier: Modifier = Modifier) {
             RadioStationRow(
                 modifier = Modifier,
                 item = mockRadioStation(),
+                currentPlayingStationId = "",
                 isFavorite = false,
                 onFavClick = {}
             )
@@ -151,6 +177,7 @@ fun RadioStationRowPreview2(modifier: Modifier = Modifier) {
             RadioStationRow(
                 modifier = Modifier,
                 item = mockRadioStation(),
+                currentPlayingStationId = "",
                 isFavorite = true,
                 onFavClick = {}
             )

@@ -31,6 +31,7 @@ import ru.asmelnikov.rockbluesradio.presentation.navigation.popUp
 fun FavoritesScreen(
     isPlayerSetUp: Boolean,
     hazeState: HazeState,
+    currentPlayingStationId: String,
     viewModel: FavoritesViewModel = koinViewModel(),
     navController: NavBackStack<NavKey>,
     onItemsUpdate: (List<RadioStation>) -> Unit = {},
@@ -44,12 +45,16 @@ fun FavoritesScreen(
                 is FavoritesEvent.OnItemsUpdate -> {
                     onItemsUpdate(favoriteStations)
                 }
+                is FavoritesEvent.NavigateBack -> {
+                    navController.popUp()
+                }
             }
         }
     }
 
     RadioStationList(
         items = favoriteStations,
+        currentPlayingStationId = currentPlayingStationId,
         isPlayerSetUp = isPlayerSetUp,
         hazeState = hazeState,
         onBackClick = {
@@ -70,6 +75,7 @@ fun RadioStationList(
     modifier: Modifier = Modifier,
     items: List<RadioStation>,
     isPlayerSetUp: Boolean,
+    currentPlayingStationId: String,
     hazeState: HazeState,
     onItemClick: (Int) -> Unit = {},
     onBackClick: () -> Unit = {},
@@ -106,6 +112,7 @@ fun RadioStationList(
                         }
                         .fillMaxWidth(),
                     item = item,
+                    currentPlayingStationId = currentPlayingStationId,
                     isFavorite = item.isFavorite,
                     onFavClick = onFavClick
                 )
