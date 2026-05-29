@@ -3,4 +3,11 @@
     <string name="rock_stations">Рок станции</string>
     <string name="blues_stations">Блюз станции</string>
     <string name="favorite_stations">Избранные станции</string>
+
+    <string name="error">Ошибка воспроизведения</string>
+    <string name="error_retry">Повторить</string>
+
+    <string name="no_internet_title">Нет подключения к интернету</string>
+    <string name="no_internet_message">Пожалуйста, проверьте подключение к сети и повторите попытку</string>
+    <string name="no_internet_waiting">Ожидание подключения…</string>
 </resources>

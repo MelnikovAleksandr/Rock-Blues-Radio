@@ -4,4 +4,11 @@
     <string name="rock_stations">Rock Stations</string>
     <string name="blues_stations">Blues Stations</string>
     <string name="favorite_stations">Favorite Stations</string>
+
+    <string name="error">Playback error</string>
+    <string name="error_retry">Retry</string>
+
+    <string name="no_internet_title">No internet connection</string>
+    <string name="no_internet_message">Please check your network connection and try again</string>
+    <string name="no_internet_waiting">Waiting for connection…</string>
 </resources>
