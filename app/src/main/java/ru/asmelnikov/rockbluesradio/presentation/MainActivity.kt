@@ -214,8 +214,7 @@ class MainActivity : ComponentActivity() {
                             },
                             isPlayerSetUp = isPlayerSetUp,
                             hazeState = hazeState,
-                            currentPlayingStationId = playerState?.takeIf { it.isPlaying }?.currentMediaItem?.mediaId
-                                ?: ""
+                            currentPlayingStationId = playerState?.takeIf { it.isPlaying }?.currentMediaItem?.mediaId?.substringAfter("_") ?: ""
                         )
                         AnimatedVisibility(
                             modifier = Modifier

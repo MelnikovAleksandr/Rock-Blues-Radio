@@ -87,6 +87,7 @@ fun RadioStationList(
 
 @Preview(locale = "ru")
 @Preview(locale = "ru", device = "spec:parent=pixel_5,orientation=landscape")
+@Preview(locale = "ru", device = "id:automotive_1408p_landscape_with_play")
 @Composable
 fun RadioStationListPreview1(modifier: Modifier = Modifier) {
     RockBluesRadioTheme(darkTheme = true) {

@@ -165,6 +165,7 @@ fun FavoriteTopAppBar(
 
 @Preview(locale = "ru")
 @Preview(device = "id:pixel_tablet")
+@Preview(device = "id:automotive_1408p_landscape_with_play")
 @Composable
 fun HomeTopAppBarPreview1(modifier: Modifier = Modifier) {
     RockBluesRadioTheme(darkTheme = true) {

@@ -3,16 +3,18 @@ package ru.asmelnikov.rockbluesradio.domain.model
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 
-fun RadioStation.toMediaItem(): MediaItem {
+fun RadioStation.toMediaItem(prefix: String = ""): MediaItem {
     val genres = genres.joinToString("|")
     val metadata = MediaMetadata.Builder()
         .setDisplayTitle(name.removeNonAlphanumericFirstChar())
         .setArtworkUri(favicon)
         .setGenre(genres)
+        .setIsBrowsable(false)
+        .setIsPlayable(true)
         .build()
     return MediaItem.Builder()
         .setUri(url)
-        .setMediaId(id)
+        .setMediaId("${prefix}_${id}")
         .setMediaMetadata(metadata)
         .build()
 }
