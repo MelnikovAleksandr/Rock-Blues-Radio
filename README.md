@@ -17,6 +17,7 @@
 - [Kotlin Serialization](https://github.com/Kotlin/kotlinx.serialization)
 - [Google Fonts](https://developer.android.com/develop/ui/compose/text/fonts#downloadable-fonts)
 - [Core Splashscreen](https://developer.android.com/develop/ui/views/launch/splash-screen)
+- [Android Auto Media](https://developer.android.com/training/cars/media)
 
 ## Structure
 <img width="398" height="399" alt="str" src="https://github.com/user-attachments/assets/2652fe48-9d23-48ad-bbaa-70a0e2217cb0" />
@@ -33,6 +34,7 @@
 <table>
   <tr>
     <td><video src="https://github.com/user-attachments/assets/2e7c4457-4521-4365-ae8b-bf0d4f50669a" width="250"></video></td>
+    <td><video src="https://github.com/user-attachments/assets/226ee54e-d978-4cf8-8436-5f1103d6327c" width="250"></video></td>
   </tr>
 </table>
 
