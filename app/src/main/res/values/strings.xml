@@ -8,6 +8,7 @@
     <string name="rock">Rock</string>
     <string name="blues">Blues</string>
     <string name="favorite">Favorite</string>
+    <string name="add_remove_favorite" translatable="false">Add/Remove favorite</string>
 
     <string name="error">Playback error</string>
     <string name="error_retry">Retry</string>

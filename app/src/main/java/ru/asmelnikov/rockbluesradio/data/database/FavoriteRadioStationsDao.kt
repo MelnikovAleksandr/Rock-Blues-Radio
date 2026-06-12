@@ -9,7 +9,7 @@ import ru.asmelnikov.rockbluesradio.data.model.RadioStationDtoItem
 
 @Dao
 interface FavoriteRadioStationsDao {
-    @Query("SELECT * FROM RadioStationDtoItem ORDER BY name")
+    @Query("SELECT * FROM RadioStationDtoItem ORDER BY rowid DESC")
     fun getAllFavoriteRadioStations(): Flow<List<RadioStationDtoItem>>
 
     @Query("SELECT stationuuid FROM RadioStationDtoItem WHERE stationuuid = :stationUuid")
