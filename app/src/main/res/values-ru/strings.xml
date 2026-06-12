@@ -4,6 +4,10 @@
     <string name="blues_stations">Блюз станции</string>
     <string name="favorite_stations">Избранные станции</string>
 
+    <string name="rock">Рок</string>
+    <string name="blues">Блюз</string>
+    <string name="favorite">Избранные</string>
+
     <string name="error">Ошибка воспроизведения</string>
     <string name="error_retry">Повторить</string>
 

@@ -26,6 +26,7 @@ import ru.asmelnikov.rockbluesradio.domain.model.toMediaItem
 import ru.asmelnikov.rockbluesradio.domain.usecase.GetFavoriteRadioStationsUseCase
 import ru.asmelnikov.rockbluesradio.domain.usecase.GetRadioStationsUseCase
 import ru.asmelnikov.rockbluesradio.presentation.MainActivity
+import androidx.core.net.toUri
 
 @ExperimentalMaterial3Api
 @OptIn(UnstableApi::class)
@@ -150,20 +151,23 @@ class PlaybackService : MediaLibraryService() {
                         add(
                             createFolder(
                                 ROCK_STATIONS,
-                                this@PlaybackService.getString(R.string.rock_stations)
+                                this@PlaybackService.getString(R.string.rock),
+                                R.drawable.guitar_auto
                             )
                         )
                         add(
                             createFolder(
                                 BLUES_STATIONS,
-                                this@PlaybackService.getString(R.string.blues_stations)
+                                this@PlaybackService.getString(R.string.blues),
+                                R.drawable.sax_auto
                             )
                         )
                         if (favoriteStations.isNotEmpty()) {
                             add(
                                 createFolder(
                                     FAVORITES,
-                                    this@PlaybackService.getString(R.string.favorite_stations)
+                                    this@PlaybackService.getString(R.string.favorite),
+                                    R.drawable.favourites_auto
                                 )
                             )
                         }
@@ -240,17 +244,21 @@ class PlaybackService : MediaLibraryService() {
 
     }
 
-    private fun createFolder(mediaId: String, title: String): MediaItem {
+    private fun createFolder(mediaId: String, title: String, iconResId: Int? = null): MediaItem {
+        val metadataBuilder = MediaMetadata.Builder()
+            .setTitle(title)
+            .setIsPlayable(false)
+            .setIsBrowsable(true)
+            .setMediaType(MediaMetadata.MEDIA_TYPE_FOLDER_RADIO_STATIONS)
+
+        iconResId?.let { resId ->
+            val artworkUri = "android.resource://$packageName/$resId".toUri()
+            metadataBuilder.setArtworkUri(artworkUri)
+        }
+
         return MediaItem.Builder()
             .setMediaId(mediaId)
-            .setMediaMetadata(
-                MediaMetadata.Builder()
-                    .setTitle(title)
-                    .setIsPlayable(false)
-                    .setIsBrowsable(true)
-                    .setMediaType(MediaMetadata.MEDIA_TYPE_FOLDER_RADIO_STATIONS)
-                    .build()
-            )
+            .setMediaMetadata(metadataBuilder.build())
             .build()
     }
 }
