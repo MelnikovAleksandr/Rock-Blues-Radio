@@ -33,15 +33,12 @@ fun HomeScreen(
         onFavoritesClick = {
             navController.navigate(Routes.FavoritesScreen)
         },
-        onItemClick = { index ->
-            onItemsUpdate(state.items)
+        onItemClick = { items, index ->
+            onItemsUpdate(items)
             onRadioStationClick(index)
         },
         onFavClick = {
             viewModel.addOrRemoteFavorites(it)
-        },
-        onGenreClick = {
-            viewModel.onGenreClick()
         }
     )
 }
