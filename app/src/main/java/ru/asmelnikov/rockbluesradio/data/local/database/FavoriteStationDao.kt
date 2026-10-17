@@ -1,23 +1,33 @@
 package ru.asmelnikov.rockbluesradio.data.local.database
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface FavoriteStationDao {
+abstract class FavoriteStationDao {
 
     @Query("SELECT * FROM RadioStationDtoItem ORDER BY rowid DESC")
-    fun observeAll(): Flow<List<FavoriteStationEntity>>
+    abstract fun observeAll(): Flow<List<FavoriteStationEntity>>
+
+    @Transaction
+    open suspend fun toggle(station: FavoriteStationEntity) {
+        if (exists(station.stationUuid)) {
+            delete(station.stationUuid)
+        } else {
+            insert(station)
+        }
+    }
 
     @Query("SELECT EXISTS(SELECT 1 FROM RadioStationDtoItem WHERE stationuuid = :stationId)")
-    suspend fun exists(stationId: String): Boolean
+    abstract suspend fun exists(stationId: String): Boolean
 
-    @Insert
-    suspend fun insert(station: FavoriteStationEntity)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    abstract suspend fun insert(station: FavoriteStationEntity)
 
-    @Delete
-    suspend fun delete(station: FavoriteStationEntity)
+    @Query("DELETE FROM RadioStationDtoItem WHERE stationuuid = :stationId")
+    abstract suspend fun delete(stationId: String)
 }

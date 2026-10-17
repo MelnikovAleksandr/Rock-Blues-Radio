@@ -28,28 +28,21 @@ fun FavoritesScreen(
     nowPlaying: NowPlaying,
     hazeState: HazeState,
     onStationClick: (stations: List<RadioStation>, index: Int) -> Unit,
-    onPlaylistUpdate: (List<RadioStation>) -> Unit,
     onBack: () -> Unit,
     viewModel: FavoritesViewModel = koinViewModel(),
 ) {
-    val favorites by viewModel.favorites.collectAsStateWithLifecycle()
-    val currentOnPlaylistUpdate by rememberUpdatedState(onPlaylistUpdate)
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val currentOnBack by rememberUpdatedState(onBack)
 
-    LaunchedEffect(viewModel) {
-        viewModel.events.collect { event ->
-            when (event) {
-                is FavoritesEvent.FavoritesChanged -> currentOnPlaylistUpdate(event.favorites)
-                FavoritesEvent.NavigateBack -> currentOnBack()
-            }
-        }
+    LaunchedEffect(state.isEmpty) {
+        if (state.isEmpty) currentOnBack()
     }
 
     FavoritesContent(
-        favorites = favorites,
+        favorites = state.stations,
         nowPlaying = nowPlaying,
         hazeState = hazeState,
-        onStationClick = { index -> onStationClick(favorites, index) },
+        onStationClick = { index -> onStationClick(state.stations, index) },
         onFavoriteClick = viewModel::onFavoriteClick,
         onBack = onBack,
     )

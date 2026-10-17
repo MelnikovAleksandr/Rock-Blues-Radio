@@ -13,12 +13,7 @@ import ru.asmelnikov.rockbluesradio.presentation.player.PlayerState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExpandedPlayerSheet(
-    playerState: PlayerState,
-    onPrevious: () -> Unit,
-    onNext: () -> Unit,
-    onDismiss: () -> Unit,
-) {
+fun ExpandedPlayerSheet(playerState: PlayerState, onDismiss: () -> Unit) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scope = rememberCoroutineScope()
     val hideAndDismiss: () -> Unit = {
@@ -35,11 +30,6 @@ fun ExpandedPlayerSheet(
         dragHandle = null,
         sheetMaxWidth = Dp.Unspecified,
     ) {
-        ExpandedPlayer(
-            playerState = playerState,
-            onCollapse = hideAndDismiss,
-            onPrevious = onPrevious,
-            onNext = onNext,
-        )
+        ExpandedPlayer(playerState = playerState, onCollapse = hideAndDismiss)
     }
 }

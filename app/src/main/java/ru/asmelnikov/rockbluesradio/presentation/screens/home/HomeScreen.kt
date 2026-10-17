@@ -36,7 +36,7 @@ import ru.asmelnikov.rockbluesradio.presentation.theme.RockBluesRadioTheme
 fun HomeScreen(
     nowPlaying: NowPlaying,
     hazeState: HazeState,
-    onStationClick: (stations: List<RadioStation>, index: Int) -> Unit,
+    onStationClick: (genre: Genre, stations: List<RadioStation>, index: Int) -> Unit,
     onFavoritesClick: () -> Unit,
     viewModel: HomeViewModel = koinViewModel(),
 ) {
@@ -57,7 +57,7 @@ fun HomeContent(
     state: HomeUiState,
     nowPlaying: NowPlaying,
     hazeState: HazeState,
-    onStationClick: (stations: List<RadioStation>, index: Int) -> Unit,
+    onStationClick: (genre: Genre, stations: List<RadioStation>, index: Int) -> Unit,
     onFavoritesClick: () -> Unit,
     onFavoriteClick: (RadioStation) -> Unit,
     modifier: Modifier = Modifier,
@@ -97,7 +97,8 @@ fun HomeContent(
                 modifier = Modifier.fillMaxSize(),
                 state = pagerState,
             ) { page ->
-                val stations = state.stationsOf(genres[page])
+                val genre = genres[page]
+                val stations = state.stationsOf(genre)
                 StationList(
                     modifier = Modifier.fillMaxSize(),
                     stations = stations,
@@ -107,7 +108,7 @@ fun HomeContent(
                         top = innerPadding.calculateTopPadding(),
                         bottom = innerPadding.calculateBottomPadding(),
                     ),
-                    onStationClick = { index -> onStationClick(stations, index) },
+                    onStationClick = { index -> onStationClick(genre, stations, index) },
                     onFavoriteClick = onFavoriteClick,
                 )
             }
@@ -128,13 +129,12 @@ private fun HomeContentPreview() {
         ) {
             HomeContent(
                 state = HomeUiState(
-                    isLoading = false,
                     stationsByGenre = Genre.entries.associateWith { PreviewData.stations() },
                     showFavoritesButton = true,
                 ),
                 nowPlaying = NowPlaying(),
                 hazeState = rememberHazeState(),
-                onStationClick = { _, _ -> },
+                onStationClick = { _, _, _ -> },
                 onFavoritesClick = {},
                 onFavoriteClick = {},
             )

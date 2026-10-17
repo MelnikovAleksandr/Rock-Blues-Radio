@@ -6,7 +6,8 @@ import androidx.annotation.StringRes
 import androidx.core.net.toUri
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
-import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.flow.first
 import ru.asmelnikov.rockbluesradio.R
 import ru.asmelnikov.rockbluesradio.domain.model.Genre
 import ru.asmelnikov.rockbluesradio.domain.model.RadioStation
@@ -17,77 +18,90 @@ class PlaybackCatalog(
     private val observeStationsByGenre: ObserveStationsByGenreUseCase,
     private val observeFavoriteStations: ObserveFavoriteStationsUseCase,
 ) {
-    var rockStations: List<RadioStation> = emptyList()
-        private set
-    var bluesStations: List<RadioStation> = emptyList()
-        private set
-    var favoriteStations: List<RadioStation> = emptyList()
-        private set
+    private val loaded = CompletableDeferred<Unit>()
+    private val stationsByFolder = mutableMapOf<StationFolder, List<RadioStation>>()
+
+    val favoriteStations: List<RadioStation>
+        get() = stations(StationFolder.Favorites)
 
     suspend fun load() {
-        rockStations = observeStationsByGenre(Genre.Rock).firstOrNull().orEmpty()
-        bluesStations = observeStationsByGenre(Genre.Blues).firstOrNull().orEmpty()
-        refreshFavorites()
+        try {
+            Genre.entries.forEach { genre ->
+                stationsByFolder[StationFolder.of(genre)] = runCatching { observeStationsByGenre(genre).first() }
+                    .getOrDefault(emptyList())
+            }
+            setFavorites(runCatching { observeFavoriteStations().first() }.getOrDefault(emptyList()))
+        } finally {
+            loaded.complete(Unit)
+        }
     }
 
-    suspend fun refreshFavorites() {
-        favoriteStations = observeFavoriteStations().firstOrNull().orEmpty()
+    suspend fun awaitLoaded() {
+        loaded.await()
     }
 
     fun setFavorites(favorites: List<RadioStation>) {
-        favoriteStations = favorites
+        stationsByFolder[StationFolder.Favorites] = favorites
     }
 
-    fun shouldRefreshFavorites(parentId: String): Boolean =
-        parentId == PlaybackContract.ROOT_ID || parentId == PlaybackContract.FAVORITES
-
-    fun rootChildrenCount(): Int = rootFolders().size
+    fun stations(folder: StationFolder): List<RadioStation> = stationsByFolder[folder].orEmpty()
 
     fun childCount(parentId: String): Int = when (parentId) {
-        PlaybackContract.ROOT_ID -> rootChildrenCount()
-        else -> stationsIn(parentId)?.size ?: 0
+        PlaybackContract.ROOT_ID -> rootFolders().size
+        else -> StationFolder.fromFolderId(parentId)?.let { stations(it).size } ?: 0
     }
 
-    fun childrenForParent(context: Context, parentId: String): List<MediaItem> = when (parentId) {
-        PlaybackContract.ROOT_ID -> rootFolders().map { it.toMediaItem(context) }
-        else -> stationsIn(parentId)?.map { it.toMediaItem(parentId) }.orEmpty()
+    fun children(context: Context, parentId: String): List<MediaItem> = when (parentId) {
+        PlaybackContract.ROOT_ID -> rootFolders().map { it.toFolderMediaItem(context) }
+        else -> StationFolder.fromFolderId(parentId)?.let { stations(it).toMediaItems(it) }.orEmpty()
     }
 
-    fun stationsIn(folderId: String): List<RadioStation>? = when (folderId) {
-        PlaybackContract.ROCK_STATIONS -> rockStations
-        PlaybackContract.BLUES_STATIONS -> bluesStations
-        PlaybackContract.FAVORITES -> favoriteStations
-        else -> null
-    }
+    fun findStation(mediaId: String): RadioStation? = findStationWithFolder(mediaId)?.second
 
-    fun findStationByMediaId(mediaId: String): RadioStation? {
+    fun findMediaItem(mediaId: String): MediaItem? =
+        findStationWithFolder(mediaId)?.let { (folder, station) -> station.toMediaItem(folder) }
+
+    private fun findStationWithFolder(mediaId: String): Pair<StationFolder, RadioStation>? {
         val stationId = PlaybackContract.stationId(mediaId)
-        return rockStations.find { it.id == stationId }
-            ?: bluesStations.find { it.id == stationId }
-            ?: favoriteStations.find { it.id == stationId }
-    }
-
-    private fun rootFolders(): List<Folder> = buildList {
-        add(Folder(PlaybackContract.ROCK_STATIONS, R.string.rock, R.drawable.guitar_auto))
-        add(Folder(PlaybackContract.BLUES_STATIONS, R.string.blues, R.drawable.sax_auto))
-        if (favoriteStations.isNotEmpty()) {
-            add(Folder(PlaybackContract.FAVORITES, R.string.favorite, R.drawable.favourites_auto))
+        val searchOrder = listOfNotNull(PlaybackContract.folderOf(mediaId)) + StationFolder.entries
+        return searchOrder.firstNotNullOfOrNull { folder ->
+            stations(folder).find { it.id == stationId }?.let { folder to it }
         }
     }
 
-    private data class Folder(val mediaId: String, @StringRes val titleRes: Int, @DrawableRes val iconRes: Int) {
-        fun toMediaItem(context: Context): MediaItem {
-            val metadata = MediaMetadata.Builder()
-                .setTitle(context.getString(titleRes))
-                .setIsPlayable(false)
-                .setIsBrowsable(true)
-                .setMediaType(MediaMetadata.MEDIA_TYPE_FOLDER_RADIO_STATIONS)
-                .setArtworkUri("android.resource://${context.packageName}/$iconRes".toUri())
-                .build()
-            return MediaItem.Builder()
-                .setMediaId(mediaId)
-                .setMediaMetadata(metadata)
-                .build()
-        }
+    private fun rootFolders(): List<StationFolder> = buildList {
+        add(StationFolder.Rock)
+        add(StationFolder.Blues)
+        if (favoriteStations.isNotEmpty()) add(StationFolder.Favorites)
     }
+
+    private fun StationFolder.toFolderMediaItem(context: Context): MediaItem {
+        val metadata = MediaMetadata.Builder()
+            .setTitle(context.getString(titleRes))
+            .setIsPlayable(false)
+            .setIsBrowsable(true)
+            .setMediaType(MediaMetadata.MEDIA_TYPE_FOLDER_RADIO_STATIONS)
+            .setArtworkUri("android.resource://${context.packageName}/$iconRes".toUri())
+            .build()
+        return MediaItem.Builder()
+            .setMediaId(mediaId)
+            .setMediaMetadata(metadata)
+            .build()
+    }
+
+    @get:StringRes
+    private val StationFolder.titleRes: Int
+        get() = when (this) {
+            StationFolder.Rock -> R.string.rock
+            StationFolder.Blues -> R.string.blues
+            StationFolder.Favorites -> R.string.favorite
+        }
+
+    @get:DrawableRes
+    private val StationFolder.iconRes: Int
+        get() = when (this) {
+            StationFolder.Rock -> R.drawable.guitar_auto
+            StationFolder.Blues -> R.drawable.sax_auto
+            StationFolder.Favorites -> R.drawable.favourites_auto
+        }
 }

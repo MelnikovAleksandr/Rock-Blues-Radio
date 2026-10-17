@@ -58,7 +58,7 @@ fun StationList(
         }
 
         item { Spacer(modifier = Modifier.navigationBarsPadding()) }
-        if (nowPlaying.isPlayerSetUp) {
+        if (nowPlaying.isMiniPlayerVisible) {
             item { Spacer(modifier = Modifier.height(MiniPlayerSpace)) }
         }
     }

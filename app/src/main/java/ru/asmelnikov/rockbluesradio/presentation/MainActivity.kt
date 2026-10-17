@@ -15,9 +15,9 @@ class MainActivity : ComponentActivity() {
     private val mainViewModel: MainViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        installSplashScreen()
         setContent {
             RockBluesRadioTheme {
                 RadioApp(viewModel = mainViewModel)

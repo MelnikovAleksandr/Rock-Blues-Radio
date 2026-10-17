@@ -67,7 +67,7 @@ fun MiniPlayer(
                         modifier = Modifier
                             .padding(start = dimens.small1)
                             .weight(1f),
-                        text = mediaItem.mediaMetadata.displayTitle.toString(),
+                        text = mediaItem.mediaMetadata.displayTitle?.toString().orEmpty(),
                         color = MaterialTheme.colorScheme.onPrimaryContainer,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,

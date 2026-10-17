@@ -8,7 +8,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ru.asmelnikov.rockbluesradio.domain.model.Genre
@@ -37,11 +36,10 @@ class HomeViewModel(
 
     private fun observeStations(genre: Genre) {
         observeStationsByGenre(genre)
-            .onStart { _state.update { it.copy(isLoading = true, error = null) } }
+            .catch { emit(emptyList()) }
             .onEach { stations ->
-                _state.update { it.copy(isLoading = false, stationsByGenre = it.stationsByGenre + (genre to stations)) }
+                _state.update { it.copy(stationsByGenre = it.stationsByGenre + (genre to stations)) }
             }
-            .catch { error -> _state.update { it.copy(isLoading = false, error = error.message) } }
             .launchIn(viewModelScope)
     }
 

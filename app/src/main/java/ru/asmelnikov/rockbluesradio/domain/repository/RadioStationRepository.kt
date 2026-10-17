@@ -10,9 +10,5 @@ interface RadioStationRepository {
 
     fun observeFavoriteStations(): Flow<List<RadioStation>>
 
-    suspend fun isFavorite(stationId: String): Boolean
-
-    suspend fun addToFavorites(station: RadioStation)
-
-    suspend fun removeFromFavorites(station: RadioStation)
+    suspend fun toggleFavorite(station: RadioStation)
 }
