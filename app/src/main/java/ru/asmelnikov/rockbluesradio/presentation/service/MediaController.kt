@@ -13,9 +13,9 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
 import com.google.common.util.concurrent.ListenableFuture
@@ -23,7 +23,7 @@ import com.google.common.util.concurrent.MoreExecutors
 
 @Composable
 fun rememberManagedMediaController(
-    lifecycle: Lifecycle = LocalLifecycleOwner.current.lifecycle
+    lifecycle: Lifecycle = LocalLifecycleOwner.current.lifecycle,
 ): State<MediaController?> {
     val appContext = LocalContext.current.applicationContext
     val controllerManager = remember { MediaControllerManager.getInstance(appContext) }
@@ -50,19 +50,21 @@ internal class MediaControllerManager private constructor(context: Context) : Re
     var controller = mutableStateOf<MediaController?>(null)
         private set
 
-    init { initialize() }
+    init {
+        initialize()
+    }
 
     @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
     internal fun initialize() {
         if (factory == null || factory?.isDone == true) {
             factory = MediaController.Builder(
                 appContext,
-                SessionToken(appContext, ComponentName(appContext, PlaybackService::class.java))
+                SessionToken(appContext, ComponentName(appContext, PlaybackService::class.java)),
             ).buildAsync()
         }
         factory?.addListener(
             { controller.value = factory?.let { if (it.isDone) it.get() else null } },
-            MoreExecutors.directExecutor()
+            MoreExecutors.directExecutor(),
         )
     }
 
@@ -74,17 +76,19 @@ internal class MediaControllerManager private constructor(context: Context) : Re
         factory = null
     }
 
-    override fun onAbandoned() { release() }
-    override fun onForgotten() { release() }
+    override fun onAbandoned() {
+        release()
+    }
+    override fun onForgotten() {
+        release()
+    }
     override fun onRemembered() {}
 
     companion object {
         @Volatile
         private var instance: MediaControllerManager? = null
-        fun getInstance(context: Context): MediaControllerManager {
-            return instance ?: synchronized(this) {
-                instance ?: MediaControllerManager(context).also { instance = it }
-            }
+        fun getInstance(context: Context): MediaControllerManager = instance ?: synchronized(this) {
+            instance ?: MediaControllerManager(context).also { instance = it }
         }
     }
 }

@@ -17,7 +17,9 @@ fun Player.updatePlaylist(incoming: List<MediaItem>) {
     }
     val currentMediaId = if (currentMediaItem != null) {
         currentMediaItem!!.mediaId
-    } else null
+    } else {
+        null
+    }
     setMediaItems(incoming)
     if (currentMediaId != null) {
         val newIndex = incoming.indexOfFirst { it.mediaId == currentMediaId }

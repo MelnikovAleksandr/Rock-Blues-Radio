@@ -47,12 +47,12 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.hazeEffect
 import dev.chrisbanes.haze.rememberHazeState
+import kotlin.math.abs
 import ru.asmelnikov.rockbluesradio.R
 import ru.asmelnikov.rockbluesradio.domain.model.Genre
 import ru.asmelnikov.rockbluesradio.presentation.theme.RockBluesRadioTheme
 import ru.asmelnikov.rockbluesradio.presentation.theme.dimens
 import ru.asmelnikov.rockbluesradio.presentation.utils.navigationBarsPaddingIfLandscape
-import kotlin.math.abs
 
 @Composable
 fun HomeTopAppBar(
@@ -61,15 +61,14 @@ fun HomeTopAppBar(
     hazeState: HazeState,
     genre: Genre,
     onGenreClick: () -> Unit,
-    onFavClick: () -> Unit
+    onFavClick: () -> Unit,
 ) {
     Column(
         modifier = modifier
             .hazeEffect(state = hazeState)
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.background.copy(alpha = 0.2f))
+            .background(MaterialTheme.colorScheme.background.copy(alpha = 0.2f)),
     ) {
-
         Row(
             modifier = Modifier
                 .navigationBarsPaddingIfLandscape()
@@ -79,26 +78,26 @@ fun HomeTopAppBar(
                 .padding(bottom = dimens.small1)
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             TextButton(
-                onClick = onGenreClick
+                onClick = onGenreClick,
             ) {
                 AnimatedContent(
-                    targetState = genre
+                    targetState = genre,
                 ) { targetGenre ->
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
                             text = stringResource(targetGenre.strRes),
                             color = MaterialTheme.colorScheme.onBackground,
-                            style = MaterialTheme.typography.headlineLarge
+                            style = MaterialTheme.typography.headlineLarge,
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Icon(
                             modifier = Modifier.fillMaxHeight(0.8f),
                             painter = painterResource(targetGenre.drawableRes),
                             tint = Color.Unspecified,
-                            contentDescription = null
+                            contentDescription = null,
                         )
                     }
                 }
@@ -107,20 +106,20 @@ fun HomeTopAppBar(
             AnimatedVisibility(
                 visible = favoritesEnabled,
                 enter = fadeIn(),
-                exit = fadeOut()
+                exit = fadeOut(),
             ) {
                 IconButton(
                     modifier = Modifier.size(dimens.medium4),
-                    onClick = onFavClick
+                    onClick = onFavClick,
                 ) {
                     val composition by rememberLottieComposition(
-                        LottieCompositionSpec.RawRes(R.raw.favorite_main)
+                        LottieCompositionSpec.RawRes(R.raw.favorite_main),
                     )
                     LottieAnimation(
                         modifier = Modifier.fillMaxSize(fraction = 0.8f),
                         composition = composition,
                         iterations = LottieConstants.IterateForever,
-                        speed = 0.5f
+                        speed = 0.5f,
                     )
                 }
             }
@@ -133,15 +132,14 @@ fun HomeTitleBar(
     modifier: Modifier = Modifier,
     favoritesEnabled: Boolean,
     hazeState: HazeState,
-    onFavClick: () -> Unit
+    onFavClick: () -> Unit,
 ) {
     Column(
         modifier = modifier
             .hazeEffect(state = hazeState)
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.background.copy(alpha = 0.2f))
+            .background(MaterialTheme.colorScheme.background.copy(alpha = 0.2f)),
     ) {
-
         Row(
             modifier = Modifier
                 .navigationBarsPaddingIfLandscape()
@@ -151,31 +149,31 @@ fun HomeTitleBar(
                 .padding(bottom = dimens.small1)
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
                 text = stringResource(R.string.app_name),
                 style = MaterialTheme.typography.headlineLarge,
-                color = MaterialTheme.colorScheme.onBackground
+                color = MaterialTheme.colorScheme.onBackground,
             )
 
             AnimatedVisibility(
                 visible = favoritesEnabled,
                 enter = fadeIn(),
-                exit = fadeOut()
+                exit = fadeOut(),
             ) {
                 IconButton(
                     modifier = Modifier.size(dimens.medium4),
-                    onClick = onFavClick
+                    onClick = onFavClick,
                 ) {
                     val composition by rememberLottieComposition(
-                        LottieCompositionSpec.RawRes(R.raw.favorite_main)
+                        LottieCompositionSpec.RawRes(R.raw.favorite_main),
                     )
                     LottieAnimation(
                         modifier = Modifier.fillMaxSize(fraction = 0.8f),
                         composition = composition,
                         iterations = LottieConstants.IterateForever,
-                        speed = 0.5f
+                        speed = 0.5f,
                     )
                 }
             }
@@ -189,7 +187,7 @@ fun GenrePagerSwitcher(
     hazeState: HazeState,
     pagerProgress: Float,
     onRockClick: () -> Unit,
-    onBluesClick: () -> Unit
+    onBluesClick: () -> Unit,
 ) {
     val shape = RoundedCornerShape(percent = 50)
     val rockSelectionProgress = (1f - abs(pagerProgress - 0f)).coerceIn(0f, 1f)
@@ -199,7 +197,7 @@ fun GenrePagerSwitcher(
             .padding(dimens.small2)
             .background(Color.Transparent, shape)
             .border(dimens.borderSize, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f), shape),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         GenreSegmentButton(
             modifier = Modifier.weight(1f),
@@ -210,9 +208,9 @@ fun GenrePagerSwitcher(
                 topStart = 999.dp,
                 bottomStart = 999.dp,
                 topEnd = 0.dp,
-                bottomEnd = 0.dp
+                bottomEnd = 0.dp,
             ),
-            onClick = onRockClick
+            onClick = onRockClick,
         )
         GenreSegmentButton(
             modifier = Modifier.weight(1f),
@@ -223,9 +221,9 @@ fun GenrePagerSwitcher(
                 topStart = 0.dp,
                 bottomStart = 0.dp,
                 topEnd = 999.dp,
-                bottomEnd = 999.dp
+                bottomEnd = 999.dp,
             ),
-            onClick = onBluesClick
+            onClick = onBluesClick,
         )
     }
 }
@@ -237,7 +235,7 @@ private fun GenreSegmentButton(
     text: String,
     selectionProgress: Float,
     shape: RoundedCornerShape,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     val selectedColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.25f)
     val unselectedColor = MaterialTheme.colorScheme.background.copy(alpha = 0.1f)
@@ -247,16 +245,16 @@ private fun GenreSegmentButton(
             .hazeEffect(state = hazeState)
             .background(
                 color = lerp(unselectedColor, selectedColor, selectionProgress),
-                shape = shape
+                shape = shape,
             )
             .clickable(onClick = onClick)
             .padding(vertical = dimens.small1),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         Text(
             text = text,
             color = MaterialTheme.colorScheme.onBackground,
-            fontWeight = if (selectionProgress >= 0.5f) FontWeight.SemiBold else FontWeight.Normal
+            fontWeight = if (selectionProgress >= 0.5f) FontWeight.SemiBold else FontWeight.Normal,
         )
     }
 }
@@ -265,15 +263,14 @@ private fun GenreSegmentButton(
 fun FavoriteTopAppBar(
     modifier: Modifier = Modifier,
     hazeState: HazeState,
-    navigateUp: () -> Unit
+    navigateUp: () -> Unit,
 ) {
     Column(
         modifier = modifier
             .hazeEffect(state = hazeState)
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.background.copy(alpha = 0.2f))
+            .background(MaterialTheme.colorScheme.background.copy(alpha = 0.2f)),
     ) {
-
         Row(
             modifier = Modifier
                 .statusBarsPadding()
@@ -281,23 +278,23 @@ fun FavoriteTopAppBar(
                 .padding(bottom = dimens.small1)
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             IconButton(
                 modifier = Modifier.size(dimens.medium4),
-                onClick = navigateUp
+                onClick = navigateUp,
             ) {
                 Icon(
                     modifier = Modifier.fillMaxSize(fraction = 0.8f),
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back"
+                    contentDescription = "Back",
                 )
             }
             Spacer(modifier = Modifier.width(dimens.small1))
             Text(
                 text = stringResource(R.string.favorite_stations),
                 color = MaterialTheme.colorScheme.onBackground,
-                style = MaterialTheme.typography.headlineLarge
+                style = MaterialTheme.typography.headlineLarge,
             )
         }
     }
@@ -312,14 +309,14 @@ fun HomeTopAppBarPreview1(modifier: Modifier = Modifier) {
         Box(
             modifier = modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.background)
+                .background(MaterialTheme.colorScheme.background),
         ) {
             HomeTopAppBar(
                 genre = Genre.Rock,
                 favoritesEnabled = true,
                 hazeState = rememberHazeState(),
                 onGenreClick = {},
-                onFavClick = {}
+                onFavClick = {},
             )
         }
     }
@@ -332,14 +329,14 @@ fun HomeTopAppBarPreview2(modifier: Modifier = Modifier) {
         Box(
             modifier = modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.background)
+                .background(MaterialTheme.colorScheme.background),
         ) {
             HomeTopAppBar(
                 genre = Genre.Blues,
                 favoritesEnabled = false,
                 hazeState = rememberHazeState(),
                 onGenreClick = {},
-                onFavClick = {}
+                onFavClick = {},
             )
         }
     }
@@ -353,11 +350,11 @@ fun FavoriteTopAppBarPreview1(modifier: Modifier = Modifier) {
         Box(
             modifier = modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.background)
+                .background(MaterialTheme.colorScheme.background),
         ) {
             FavoriteTopAppBar(
                 hazeState = rememberHazeState(),
-                navigateUp = {}
+                navigateUp = {},
             )
         }
     }

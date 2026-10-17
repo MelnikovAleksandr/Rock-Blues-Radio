@@ -37,7 +37,7 @@ fun FavoriteButton(
     isFavorite: Boolean,
     itemId: String,
     iconTint: Color = MaterialTheme.colorScheme.primary,
-    onFavClick: () -> Unit
+    onFavClick: () -> Unit,
 ) {
     var animationKey by remember(itemId) { mutableIntStateOf(0) }
     var isAnimating by remember(itemId) { mutableStateOf(false) }
@@ -52,15 +52,15 @@ fun FavoriteButton(
     }
 
     val composition by rememberLottieComposition(
-        LottieCompositionSpec.RawRes(R.raw.favorite_unfavorite)
+        LottieCompositionSpec.RawRes(R.raw.favorite_unfavorite),
     )
 
     val dynamicProperties = rememberLottieDynamicProperties(
         rememberLottieDynamicProperty(
             property = LottieProperty.COLOR_FILTER,
             value = PorterDuffColorFilter(iconTint.toArgb(), PorterDuff.Mode.SRC_ATOP),
-            keyPath = arrayOf("**")
-        )
+            keyPath = arrayOf("**"),
+        ),
     )
 
     IconButton(
@@ -70,7 +70,7 @@ fun FavoriteButton(
             animationKey++
             isAnimating = true
             onFavClick()
-        }
+        },
     ) {
         key(itemId, animationKey) {
             val progress by animateLottieCompositionAsState(
@@ -83,7 +83,7 @@ fun FavoriteButton(
                 } else {
                     LottieClipSpec.Frame(74, 114)
                 },
-                restartOnPlay = false
+                restartOnPlay = false,
             )
 
             LaunchedEffect(progress) {
@@ -96,11 +96,15 @@ fun FavoriteButton(
                 modifier = Modifier.fillMaxSize(fraction = 0.8f),
                 composition = composition,
                 progress = {
-                    if (isAnimating) progress
-                    else if (isFavorite) 74f / 129f
-                    else 0f
+                    if (isAnimating) {
+                        progress
+                    } else if (isFavorite) {
+                        74f / 129f
+                    } else {
+                        0f
+                    }
                 },
-                dynamicProperties = dynamicProperties
+                dynamicProperties = dynamicProperties,
             )
         }
     }
@@ -113,12 +117,12 @@ fun FavoriteButtonPreview1(modifier: Modifier = Modifier) {
         Box(
             modifier = modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.background)
+                .background(MaterialTheme.colorScheme.background),
         ) {
             FavoriteButton(
                 isFavorite = true,
                 itemId = "123",
-                onFavClick = {}
+                onFavClick = {},
             )
         }
     }
@@ -131,15 +135,13 @@ fun FavoriteButtonPreview2(modifier: Modifier = Modifier) {
         Box(
             modifier = modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.background)
+                .background(MaterialTheme.colorScheme.background),
         ) {
             FavoriteButton(
                 isFavorite = false,
                 itemId = "123",
-                onFavClick = {}
+                onFavClick = {},
             )
         }
     }
 }
-
-

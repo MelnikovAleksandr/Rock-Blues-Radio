@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlin.parcelize)
+    alias(libs.plugins.ktlint)
 }
 
 android {
@@ -45,7 +46,7 @@ android {
             isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
     }
@@ -64,10 +65,10 @@ androidComponents {
             if (output is com.android.build.api.variant.impl.VariantOutputImpl) {
                 val baseName = "Rock&BluesRadio"
                 val buildType = variant.buildType.orEmpty()
-                val fileName = "${baseName}-${buildType}-" +
-                        "v${android.defaultConfig.versionName}-" +
-                        "vc${android.defaultConfig.versionCode}-" +
-                        "${getDateTimeFormat()}.apk"
+                val fileName = "$baseName-$buildType-" +
+                    "v${android.defaultConfig.versionName}-" +
+                    "vc${android.defaultConfig.versionCode}-" +
+                    "${getDateTimeFormat()}.apk"
 
                 output.outputFileName.set(fileName)
             }
@@ -141,4 +142,10 @@ dependencies {
 fun getDateTimeFormat(): String {
     val simpleDateFormat = SimpleDateFormat("ddMMyy")
     return simpleDateFormat.format(Date())
+}
+ktlint {
+    android.set(true)
+    filter {
+        exclude { it.file.path.contains("${File.separator}build${File.separator}") }
+    }
 }

@@ -11,13 +11,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import coil.compose.AsyncImage
-import ru.asmelnikov.rockbluesradio.R
 import kotlin.random.Random
+import ru.asmelnikov.rockbluesradio.R
 
 @Composable
 fun PlayerArtwork(
     modifier: Modifier = Modifier,
-    artworkUri: Uri
+    artworkUri: Uri,
 ) {
     val placeholderPainter = painterResource(id = R.drawable.radio)
 
@@ -28,21 +28,21 @@ fun PlayerArtwork(
             hue = random.nextFloat() * 360f,
             saturation = 0.5f,
             lightness = 0.8f,
-            alpha = 1f
+            alpha = 1f,
         )
     }
 
     Card(
         modifier = modifier,
         shape = MaterialTheme.shapes.medium,
-        colors = CardDefaults.cardColors(containerColor = backgroundColor)
+        colors = CardDefaults.cardColors(containerColor = backgroundColor),
     ) {
         AsyncImage(
             modifier = Modifier.fillMaxSize(),
             model = artworkUri,
             contentDescription = null,
             placeholder = placeholderPainter,
-            error = placeholderPainter
+            error = placeholderPainter,
         )
     }
 }

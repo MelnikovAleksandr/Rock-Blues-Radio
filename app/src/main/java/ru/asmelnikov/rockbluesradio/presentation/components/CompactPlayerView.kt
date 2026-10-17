@@ -33,34 +33,33 @@ fun CompactPlayerView(
     isPlaying: Boolean,
     isBuffering: Boolean,
     hazeState: HazeState,
-    onPlayPauseClick: () -> Unit
+    onPlayPauseClick: () -> Unit,
 ) {
-
     Card(
         modifier = modifier
             .height(dimens.regular)
             .clip(MaterialTheme.shapes.medium),
-        shape = MaterialTheme.shapes.medium
+        shape = MaterialTheme.shapes.medium,
     ) {
         Row(
             modifier = Modifier
                 .hazeEffect(state = hazeState)
                 .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f)),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Row(
                 modifier = Modifier
                     .weight(1f)
                     .padding(end = dimens.small1),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 if (currentMediaItem != null) {
                     MiniPlayerArtworkView(
                         modifier = Modifier
                             .aspectRatio(1f)
                             .padding(dimens.extraSmall1),
-                        artworkUri = currentMediaItem.mediaMetadata.artworkUri
+                        artworkUri = currentMediaItem.mediaMetadata.artworkUri,
                     )
                     Text(
                         modifier = Modifier
@@ -70,7 +69,7 @@ fun CompactPlayerView(
                         color = MaterialTheme.colorScheme.onPrimaryContainer,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        style = MaterialTheme.typography.bodyLarge
+                        style = MaterialTheme.typography.bodyLarge,
                     )
                 }
             }
@@ -81,7 +80,7 @@ fun CompactPlayerView(
                 isPlaying = isPlaying,
                 isBuffering = isBuffering,
                 iconTint = MaterialTheme.colorScheme.onPrimaryContainer,
-                onTogglePlayPause = onPlayPauseClick
+                onTogglePlayPause = onPlayPauseClick,
             )
         }
     }
@@ -95,7 +94,7 @@ fun CompactPlayerViewPreview1(modifier: Modifier = Modifier) {
         Box(
             modifier = modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.background)
+                .background(MaterialTheme.colorScheme.background),
         ) {
             CompactPlayerView(
                 modifier = Modifier.padding(12.dp),
@@ -103,7 +102,7 @@ fun CompactPlayerViewPreview1(modifier: Modifier = Modifier) {
                 isPlaying = false,
                 isBuffering = false,
                 hazeState = rememberHazeState(),
-                onPlayPauseClick = {}
+                onPlayPauseClick = {},
             )
         }
     }
@@ -116,7 +115,7 @@ fun CompactPlayerViewPreview2(modifier: Modifier = Modifier) {
         Box(
             modifier = modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.background)
+                .background(MaterialTheme.colorScheme.background),
         ) {
             CompactPlayerView(
                 modifier = Modifier.padding(12.dp),
@@ -124,7 +123,7 @@ fun CompactPlayerViewPreview2(modifier: Modifier = Modifier) {
                 isPlaying = true,
                 isBuffering = false,
                 hazeState = rememberHazeState(),
-                onPlayPauseClick = {}
+                onPlayPauseClick = {},
             )
         }
     }
@@ -137,7 +136,7 @@ fun CompactPlayerViewPreview3(modifier: Modifier = Modifier) {
         Box(
             modifier = modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.background)
+                .background(MaterialTheme.colorScheme.background),
         ) {
             CompactPlayerView(
                 modifier = Modifier.padding(12.dp),
@@ -145,7 +144,7 @@ fun CompactPlayerViewPreview3(modifier: Modifier = Modifier) {
                 isPlaying = false,
                 isBuffering = true,
                 hazeState = rememberHazeState(),
-                onPlayPauseClick = {}
+                onPlayPauseClick = {},
             )
         }
     }

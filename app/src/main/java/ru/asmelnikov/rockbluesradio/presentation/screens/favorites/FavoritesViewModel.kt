@@ -15,7 +15,7 @@ import ru.asmelnikov.rockbluesradio.domain.usecase.GetFavoriteRadioStationsUseCa
 
 class FavoritesViewModel(
     private val getFavoriteRadioStationsUseCase: GetFavoriteRadioStationsUseCase,
-    private val addToOrRemoveFromFavoritesUseCase: AddToOrRemoveFromFavoritesUseCase
+    private val addToOrRemoveFromFavoritesUseCase: AddToOrRemoveFromFavoritesUseCase,
 ) : ViewModel() {
     private val _favorites = MutableStateFlow<List<RadioStation>>(emptyList())
     val favorites = _favorites.asStateFlow()

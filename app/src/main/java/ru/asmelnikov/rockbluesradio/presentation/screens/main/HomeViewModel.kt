@@ -18,7 +18,7 @@ import ru.asmelnikov.rockbluesradio.domain.usecase.GetRadioStationsUseCase
 class HomeViewModel(
     private val getRadioStationsUseCase: GetRadioStationsUseCase,
     private val addToOrRemoveFromFavoritesUseCase: AddToOrRemoveFromFavoritesUseCase,
-    private val getFavoritesRadioCountUseCase: GetFavoritesRadioCountUseCase
+    private val getFavoritesRadioCountUseCase: GetFavoritesRadioCountUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ScreenState(isLoading = true))
@@ -79,7 +79,6 @@ class HomeViewModel(
                 }
         }
     }
-
 }
 
 data class ScreenState(
@@ -87,5 +86,5 @@ data class ScreenState(
     val rockItems: List<RadioStation> = emptyList(),
     val bluesItems: List<RadioStation> = emptyList(),
     val error: String? = null,
-    val showFavoritesButton: Boolean = false
+    val showFavoritesButton: Boolean = false,
 )

@@ -8,7 +8,7 @@ import ru.asmelnikov.rockbluesradio.data.di.dataModule
 import ru.asmelnikov.rockbluesradio.domain.di.domainModule
 import ru.asmelnikov.rockbluesradio.presentation.di.uiModule
 
-class App: Application() {
+class App : Application() {
 
     override fun onCreate() {
         super.onCreate()

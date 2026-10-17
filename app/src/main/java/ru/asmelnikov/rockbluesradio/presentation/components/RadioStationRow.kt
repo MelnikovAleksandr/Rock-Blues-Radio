@@ -31,12 +31,12 @@ import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
+import kotlin.random.Random
 import ru.asmelnikov.rockbluesradio.R
 import ru.asmelnikov.rockbluesradio.domain.model.RadioStation
 import ru.asmelnikov.rockbluesradio.presentation.theme.RockBluesRadioTheme
 import ru.asmelnikov.rockbluesradio.presentation.theme.dimens
 import ru.asmelnikov.rockbluesradio.presentation.utils.navigationBarsAndCutoutPaddingIfLandscape
-import kotlin.random.Random
 
 @Composable
 fun RadioStationRow(
@@ -44,21 +44,19 @@ fun RadioStationRow(
     item: RadioStation,
     currentPlayingStationId: String,
     isFavorite: Boolean,
-    onFavClick: (RadioStation) -> Unit
+    onFavClick: (RadioStation) -> Unit,
 ) {
-
     Row(
         modifier = modifier.navigationBarsAndCutoutPaddingIfLandscape(),
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Row(
             modifier = Modifier
                 .weight(1f)
                 .padding(end = dimens.small1),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-
             val backgroundColor = remember(item.favicon) {
                 val seed = item.favicon.hashCode()
                 val random = Random(seed)
@@ -66,7 +64,7 @@ fun RadioStationRow(
                     hue = random.nextFloat() * 360f,
                     saturation = 0.5f,
                     lightness = 0.8f,
-                    alpha = 1f
+                    alpha = 1f,
                 )
             }
 
@@ -77,8 +75,8 @@ fun RadioStationRow(
                     .padding(dimens.small1),
                 shape = MaterialTheme.shapes.medium,
                 colors = CardDefaults.cardColors(
-                    containerColor = backgroundColor
-                )
+                    containerColor = backgroundColor,
+                ),
             ) {
                 Box {
                     val placeholderPainter = painterResource(id = R.drawable.radio)
@@ -88,21 +86,21 @@ fun RadioStationRow(
                         model = item.favicon,
                         contentDescription = null,
                         placeholder = placeholderPainter,
-                        error = placeholderPainter
+                        error = placeholderPainter,
                     )
 
                     this@Card.AnimatedVisibility(
                         visible = item.id == currentPlayingStationId,
                         enter = fadeIn(),
-                        exit = fadeOut()
+                        exit = fadeOut(),
                     ) {
                         val composition by rememberLottieComposition(
-                            LottieCompositionSpec.RawRes(R.raw.playing)
+                            LottieCompositionSpec.RawRes(R.raw.playing),
                         )
                         LottieAnimation(
                             modifier = Modifier.fillMaxSize(),
                             composition = composition,
-                            iterations = LottieConstants.IterateForever
+                            iterations = LottieConstants.IterateForever,
                         )
                     }
                 }
@@ -113,13 +111,13 @@ fun RadioStationRow(
                     .padding(start = dimens.small1)
                     .weight(1f),
                 horizontalAlignment = Alignment.Start,
-                verticalArrangement = Arrangement.Center
+                verticalArrangement = Arrangement.Center,
             ) {
                 Text(
                     text = item.name,
                     color = MaterialTheme.colorScheme.onBackground,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
                 )
                 val genres = item.genres
                 if (genres.isNotEmpty()) {
@@ -127,7 +125,7 @@ fun RadioStationRow(
                         text = genres.joinToString("|"),
                         color = MaterialTheme.colorScheme.onBackground,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
                     )
                 }
             }
@@ -138,7 +136,7 @@ fun RadioStationRow(
                 .size(dimens.medium4),
             isFavorite = isFavorite,
             itemId = item.id,
-            onFavClick = { onFavClick(item) }
+            onFavClick = { onFavClick(item) },
         )
     }
 }
@@ -151,14 +149,14 @@ fun RadioStationRowPreview1(modifier: Modifier = Modifier) {
         Box(
             modifier = modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.background)
+                .background(MaterialTheme.colorScheme.background),
         ) {
             RadioStationRow(
                 modifier = Modifier,
                 item = mockRadioStation(),
                 currentPlayingStationId = "",
                 isFavorite = false,
-                onFavClick = {}
+                onFavClick = {},
             )
         }
     }
@@ -172,14 +170,14 @@ fun RadioStationRowPreview2(modifier: Modifier = Modifier) {
         Box(
             modifier = modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.background)
+                .background(MaterialTheme.colorScheme.background),
         ) {
             RadioStationRow(
                 modifier = Modifier,
                 item = mockRadioStation(),
                 currentPlayingStationId = "",
                 isFavorite = true,
-                onFavClick = {}
+                onFavClick = {},
             )
         }
     }

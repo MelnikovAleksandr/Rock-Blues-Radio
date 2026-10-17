@@ -14,7 +14,7 @@ val dataModule = module {
         Room.databaseBuilder(
             context = androidContext().applicationContext,
             klass = AppDatabase::class.java,
-            name = "radio_stations.db"
+            name = "radio_stations.db",
         ).build()
     }
 
@@ -25,7 +25,7 @@ val dataModule = module {
     single<RadioStationRepository> {
         RadioStationRepositoryImpl(
             radioStationsDao = get(),
-            context = get()
+            context = get(),
         )
     }
 }

@@ -19,9 +19,7 @@ import androidx.media3.common.Tracks
 import androidx.media3.common.VideoSize
 import androidx.media3.common.text.CueGroup
 
-fun Player.state(): PlayerState {
-    return PlayerStateImpl(this)
-}
+fun Player.state(): PlayerState = PlayerStateImpl(this)
 
 interface PlayerState {
     val player: Player
@@ -86,9 +84,7 @@ interface PlayerState {
     fun dispose()
 }
 
-internal class PlayerStateImpl(
-    override val player: Player
-) : PlayerState {
+internal class PlayerStateImpl(override val player: Player) : PlayerState {
     override var timeline: Timeline by mutableStateOf(player.currentTimeline)
         private set
 
@@ -213,7 +209,7 @@ internal class PlayerStateImpl(
 
         override fun onPlayWhenReadyChanged(
             playWhenReady: Boolean,
-            @Player.PlayWhenReadyChangeReason reason: Int
+            @Player.PlayWhenReadyChangeReason reason: Int,
         ) {
             this@PlayerStateImpl.playWhenReady = playWhenReady
         }
@@ -241,7 +237,7 @@ internal class PlayerStateImpl(
         override fun onPositionDiscontinuity(
             oldPosition: Player.PositionInfo,
             newPosition: Player.PositionInfo,
-            reason: Int
+            reason: Int,
         ) {
             this@PlayerStateImpl.mediaItemIndex = player.currentMediaItemIndex
         }

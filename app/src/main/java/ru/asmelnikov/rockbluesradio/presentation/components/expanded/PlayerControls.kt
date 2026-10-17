@@ -22,18 +22,18 @@ fun PlayerControls(
     isBuffering: Boolean,
     onPlayPauseClick: () -> Unit,
     onPrevClick: () -> Unit,
-    onNextClick: () -> Unit
+    onNextClick: () -> Unit,
 ) {
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         PreviousButton(
             modifier = Modifier
                 .size(dimens.large)
                 .padding(dimens.small1),
-            iconTint = MaterialTheme.colorScheme.onSurface
+            iconTint = MaterialTheme.colorScheme.onSurface,
         ) {
             onPrevClick()
         }
@@ -45,13 +45,13 @@ fun PlayerControls(
             isPlaying = isPlaying,
             isBuffering = isBuffering,
             iconTint = MaterialTheme.colorScheme.surface,
-            onTogglePlayPause = onPlayPauseClick
+            onTogglePlayPause = onPlayPauseClick,
         )
         NextButton(
             modifier = Modifier
                 .size(dimens.large)
                 .padding(dimens.small1),
-            iconTint = MaterialTheme.colorScheme.onSurface
+            iconTint = MaterialTheme.colorScheme.onSurface,
         ) {
             onNextClick()
         }

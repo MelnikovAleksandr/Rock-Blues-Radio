@@ -1,4 +1,5 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
+
 package ru.asmelnikov.rockbluesradio.presentation.service
 
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -22,7 +23,7 @@ class PlaybackServiceCoordinator(
     private val catalog: PlaybackCatalog,
     private val getRadioStationsUseCase: GetRadioStationsUseCase,
     private val getFavoriteRadioStationsUseCase: GetFavoriteRadioStationsUseCase,
-    private val sessionProvider: () -> MediaLibraryService.MediaLibrarySession?
+    private val sessionProvider: () -> MediaLibraryService.MediaLibrarySession?,
 ) {
     fun initializeCatalog() {
         scope.launch {
@@ -41,7 +42,7 @@ class PlaybackServiceCoordinator(
                 sessionProvider()?.notifyChildrenChanged(
                     PlaybackContract.FAVORITES,
                     catalog.favoriteStations.size,
-                    null
+                    null,
                 )
 
                 val rootCountAfter = catalog.rootChildrenCount()
@@ -49,7 +50,7 @@ class PlaybackServiceCoordinator(
                     sessionProvider()?.notifyChildrenChanged(
                         PlaybackContract.ROOT_ID,
                         rootCountAfter,
-                        null
+                        null,
                     )
                 }
 
@@ -72,9 +73,9 @@ class PlaybackServiceCoordinator(
                 FavoriteButtonProvider.create(
                     context = service,
                     currentMediaItem = player.currentMediaItem,
-                    favoriteStations = catalog.favoriteStations
-                )
-            )
+                    favoriteStations = catalog.favoriteStations,
+                ),
+            ),
         )
     }
 }

@@ -10,5 +10,4 @@ sealed interface Routes : NavKey {
 
     @Serializable
     data object FavoritesScreen : Routes
-
 }

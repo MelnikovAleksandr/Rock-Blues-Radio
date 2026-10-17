@@ -33,7 +33,7 @@ class PlaybackService : MediaLibraryService() {
             catalog = catalog,
             getRadioStationsUseCase = getRadioStationsUseCase,
             getFavoriteRadioStationsUseCase = getFavoriteRadioStationsUseCase,
-            sessionProvider = { mediaLibrarySession }
+            sessionProvider = { mediaLibrarySession },
         )
         coordinator.initializeCatalog()
 
@@ -47,8 +47,8 @@ class PlaybackService : MediaLibraryService() {
                 catalog = catalog,
                 getFavoriteRadioStationsUseCase = getFavoriteRadioStationsUseCase,
                 addToOrRemoveFromFavoritesUseCase = addToOrRemoveFromFavoritesUseCase,
-                sessionProvider = { mediaLibrarySession }
-            )
+                sessionProvider = { mediaLibrarySession },
+            ),
         )
             .setPeriodicPositionUpdateEnabled(false)
             .setSessionActivity(PlaybackSessionActivityFactory.create(this))
@@ -58,9 +58,7 @@ class PlaybackService : MediaLibraryService() {
         coordinator.observePlayerTransitions()
     }
 
-    override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaLibrarySession? {
-        return mediaLibrarySession
-    }
+    override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaLibrarySession? = mediaLibrarySession
 
     override fun onDestroy() {
         mediaLibrarySession?.run {

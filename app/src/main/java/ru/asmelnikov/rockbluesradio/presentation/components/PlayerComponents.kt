@@ -40,9 +40,9 @@ import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.airbnb.lottie.compose.rememberLottieDynamicProperties
 import com.airbnb.lottie.compose.rememberLottieDynamicProperty
+import kotlin.random.Random
 import ru.asmelnikov.rockbluesradio.R
 import ru.asmelnikov.rockbluesradio.presentation.theme.RockBluesRadioTheme
-import kotlin.random.Random
 
 @Composable
 fun PlayPauseButton(
@@ -50,47 +50,47 @@ fun PlayPauseButton(
     isPlaying: Boolean,
     isBuffering: Boolean,
     iconTint: Color = MaterialTheme.colorScheme.onSurface,
-    onTogglePlayPause: () -> Unit
+    onTogglePlayPause: () -> Unit,
 ) {
     IconButton(
         modifier = modifier,
-        onClick = onTogglePlayPause
+        onClick = onTogglePlayPause,
     ) {
         AnimatedContent(
             targetState = isBuffering,
             transitionSpec = {
                 fadeIn() togetherWith fadeOut()
-            }
+            },
         ) { isBufferingState ->
             if (isBufferingState) {
                 val composition by rememberLottieComposition(
-                    LottieCompositionSpec.RawRes(R.raw.loading_circle)
+                    LottieCompositionSpec.RawRes(R.raw.loading_circle),
                 )
 
                 val dynamicProperties = rememberLottieDynamicProperties(
                     rememberLottieDynamicProperty(
                         property = LottieProperty.COLOR_FILTER,
                         value = PorterDuffColorFilter(iconTint.toArgb(), PorterDuff.Mode.SRC_ATOP),
-                        keyPath = arrayOf("**")
-                    )
+                        keyPath = arrayOf("**"),
+                    ),
                 )
 
                 val progress by animateLottieCompositionAsState(
                     composition = composition,
                     iterations = LottieConstants.IterateForever,
                     isPlaying = true,
-                    speed = 1f
+                    speed = 1f,
                 )
 
                 LottieAnimation(
                     composition = composition,
                     progress = { progress },
-                    dynamicProperties = dynamicProperties
+                    dynamicProperties = dynamicProperties,
                 )
             } else {
                 key(isPlaying) {
                     val composition by rememberLottieComposition(
-                        LottieCompositionSpec.RawRes(R.raw.pause_play)
+                        LottieCompositionSpec.RawRes(R.raw.pause_play),
                     )
 
                     val dynamicProperties = rememberLottieDynamicProperties(
@@ -98,10 +98,10 @@ fun PlayPauseButton(
                             property = LottieProperty.COLOR_FILTER,
                             value = PorterDuffColorFilter(
                                 iconTint.toArgb(),
-                                PorterDuff.Mode.SRC_ATOP
+                                PorterDuff.Mode.SRC_ATOP,
                             ),
-                            keyPath = arrayOf("**")
-                        )
+                            keyPath = arrayOf("**"),
+                        ),
                     )
 
                     val clipSpec = if (isPlaying) {
@@ -116,13 +116,13 @@ fun PlayPauseButton(
                         isPlaying = true,
                         speed = 1f,
                         clipSpec = clipSpec,
-                        restartOnPlay = true
+                        restartOnPlay = true,
                     )
 
                     LottieAnimation(
                         composition = composition,
                         progress = { progress },
-                        dynamicProperties = dynamicProperties
+                        dynamicProperties = dynamicProperties,
                     )
                 }
             }
@@ -133,11 +133,11 @@ fun PlayPauseButton(
 @Composable
 fun MiniPlayerArtworkView(
     modifier: Modifier = Modifier,
-    artworkUri: Uri?
+    artworkUri: Uri?,
 ) {
     Card(
         modifier = modifier,
-        shape = MaterialTheme.shapes.medium
+        shape = MaterialTheme.shapes.medium,
     ) {
         val placeholderPainter = painterResource(id = R.drawable.radio)
         val backgroundColor = remember(artworkUri) {
@@ -147,19 +147,19 @@ fun MiniPlayerArtworkView(
                 hue = random.nextFloat() * 360f,
                 saturation = 0.5f,
                 lightness = 0.8f,
-                alpha = 1f
+                alpha = 1f,
             )
         }
         AsyncImage(
             modifier = Modifier
                 .fillMaxSize()
                 .background(
-                    color = backgroundColor
+                    color = backgroundColor,
                 ),
             model = artworkUri,
             contentDescription = null,
             placeholder = placeholderPainter,
-            error = placeholderPainter
+            error = placeholderPainter,
         )
     }
 }
@@ -168,18 +168,18 @@ fun MiniPlayerArtworkView(
 fun PreviousButton(
     modifier: Modifier = Modifier,
     iconTint: Color = MaterialTheme.colorScheme.onSurface,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     val composition by rememberLottieComposition(
-        LottieCompositionSpec.RawRes(R.raw.next_track)
+        LottieCompositionSpec.RawRes(R.raw.next_track),
     )
 
     val dynamicProperties = rememberLottieDynamicProperties(
         rememberLottieDynamicProperty(
             property = LottieProperty.COLOR_FILTER,
             value = PorterDuffColorFilter(iconTint.toArgb(), PorterDuff.Mode.SRC_ATOP),
-            keyPath = arrayOf("**")
-        )
+            keyPath = arrayOf("**"),
+        ),
     )
 
     var shouldAnimate by remember { mutableStateOf(false) }
@@ -189,7 +189,7 @@ fun PreviousButton(
         iterations = 1,
         isPlaying = shouldAnimate,
         speed = 1f,
-        restartOnPlay = true
+        restartOnPlay = true,
     )
 
     LaunchedEffect(progress) {
@@ -203,7 +203,7 @@ fun PreviousButton(
         onClick = {
             shouldAnimate = true
             onClick()
-        }
+        },
     ) {
         LottieAnimation(
             modifier = Modifier
@@ -212,7 +212,7 @@ fun PreviousButton(
                 },
             composition = composition,
             progress = { progress },
-            dynamicProperties = dynamicProperties
+            dynamicProperties = dynamicProperties,
         )
     }
 }
@@ -221,18 +221,18 @@ fun PreviousButton(
 fun NextButton(
     modifier: Modifier = Modifier,
     iconTint: Color = MaterialTheme.colorScheme.onSurface,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     val composition by rememberLottieComposition(
-        LottieCompositionSpec.RawRes(R.raw.next_track)
+        LottieCompositionSpec.RawRes(R.raw.next_track),
     )
 
     val dynamicProperties = rememberLottieDynamicProperties(
         rememberLottieDynamicProperty(
             property = LottieProperty.COLOR_FILTER,
             value = PorterDuffColorFilter(iconTint.toArgb(), PorterDuff.Mode.SRC_ATOP),
-            keyPath = arrayOf("**")
-        )
+            keyPath = arrayOf("**"),
+        ),
     )
 
     var shouldAnimate by remember { mutableStateOf(false) }
@@ -242,7 +242,7 @@ fun NextButton(
         iterations = 1,
         isPlaying = shouldAnimate,
         speed = 1f,
-        restartOnPlay = true
+        restartOnPlay = true,
     )
 
     LaunchedEffect(progress) {
@@ -256,12 +256,12 @@ fun NextButton(
         onClick = {
             shouldAnimate = true
             onClick()
-        }
+        },
     ) {
         LottieAnimation(
             composition = composition,
             progress = { progress },
-            dynamicProperties = dynamicProperties
+            dynamicProperties = dynamicProperties,
         )
     }
 }
@@ -273,13 +273,13 @@ fun PlayPauseButtonPreview1(modifier: Modifier = Modifier) {
         Box(
             modifier = modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.background)
+                .background(MaterialTheme.colorScheme.background),
         ) {
             PlayPauseButton(
                 modifier = Modifier.padding(24.dp),
                 isPlaying = false,
                 isBuffering = false,
-                onTogglePlayPause = {}
+                onTogglePlayPause = {},
             )
         }
     }
@@ -292,13 +292,13 @@ fun PlayPauseButtonPreview2(modifier: Modifier = Modifier) {
         Box(
             modifier = modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.background)
+                .background(MaterialTheme.colorScheme.background),
         ) {
             PlayPauseButton(
                 modifier = Modifier.padding(24.dp),
                 isPlaying = false,
                 isBuffering = false,
-                onTogglePlayPause = {}
+                onTogglePlayPause = {},
             )
         }
     }
@@ -311,13 +311,13 @@ fun MiniPlayerArtworkViewPreview1(modifier: Modifier = Modifier) {
         Box(
             modifier = modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.background)
+                .background(MaterialTheme.colorScheme.background),
         ) {
             MiniPlayerArtworkView(
                 modifier = Modifier
                     .padding(24.dp)
                     .aspectRatio(1f),
-                artworkUri = Uri.EMPTY
+                artworkUri = Uri.EMPTY,
             )
         }
     }
@@ -330,10 +330,10 @@ fun PreviousButtonPreview1(modifier: Modifier = Modifier) {
         Box(
             modifier = modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.background)
+                .background(MaterialTheme.colorScheme.background),
         ) {
             PreviousButton(
-                onClick = {}
+                onClick = {},
             )
         }
     }
@@ -346,10 +346,10 @@ fun NextButtonPreview1(modifier: Modifier = Modifier) {
         Box(
             modifier = modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.background)
+                .background(MaterialTheme.colorScheme.background),
         ) {
             NextButton(
-                onClick = {}
+                onClick = {},
             )
         }
     }

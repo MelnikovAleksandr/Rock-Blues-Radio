@@ -31,12 +31,12 @@ class PlaybackLibrarySessionCallback(
     private val catalog: PlaybackCatalog,
     private val getFavoriteRadioStationsUseCase: GetFavoriteRadioStationsUseCase,
     private val addToOrRemoveFromFavoritesUseCase: AddToOrRemoveFromFavoritesUseCase,
-    private val sessionProvider: () -> MediaLibraryService.MediaLibrarySession?
+    private val sessionProvider: () -> MediaLibraryService.MediaLibrarySession?,
 ) : MediaLibraryService.MediaLibrarySession.Callback {
 
     override fun onConnect(
         session: MediaSession,
-        controller: MediaSession.ControllerInfo
+        controller: MediaSession.ControllerInfo,
     ): MediaSession.ConnectionResult {
         val connectionResult = super.onConnect(session, controller)
         val sessionCommands = connectionResult.availableSessionCommands
@@ -52,9 +52,9 @@ class PlaybackLibrarySessionCallback(
                     FavoriteButtonProvider.create(
                         context = context,
                         currentMediaItem = player.currentMediaItem,
-                        favoriteStations = catalog.favoriteStations
-                    )
-                )
+                        favoriteStations = catalog.favoriteStations,
+                    ),
+                ),
             )
             .build()
     }
@@ -63,7 +63,7 @@ class PlaybackLibrarySessionCallback(
         session: MediaSession,
         controller: MediaSession.ControllerInfo,
         customCommand: SessionCommand,
-        args: Bundle
+        args: Bundle,
     ): ListenableFuture<SessionResult> {
         if (customCommand.customAction != PlaybackContract.COMMAND_TOGGLE_FAVORITE) {
             return super.onCustomCommand(session, controller, customCommand, args)
@@ -80,21 +80,21 @@ class PlaybackLibrarySessionCallback(
             sessionProvider()?.notifyChildrenChanged(
                 PlaybackContract.FAVORITES,
                 catalog.favoriteStations.size,
-                null
+                null,
             )
             sessionProvider()?.notifyChildrenChanged(
                 PlaybackContract.ROOT_ID,
                 catalog.rootChildrenCount(),
-                null
+                null,
             )
             sessionProvider()?.setMediaButtonPreferences(
                 listOf(
                     FavoriteButtonProvider.create(
                         context = context,
                         currentMediaItem = player.currentMediaItem,
-                        favoriteStations = catalog.favoriteStations
-                    )
-                )
+                        favoriteStations = catalog.favoriteStations,
+                    ),
+                ),
             )
         }
 
@@ -105,7 +105,7 @@ class PlaybackLibrarySessionCallback(
         session: MediaLibraryService.MediaLibrarySession,
         browser: MediaSession.ControllerInfo,
         parentId: String,
-        params: MediaLibraryService.LibraryParams?
+        params: MediaLibraryService.LibraryParams?,
     ): ListenableFuture<LibraryResult<Void>> {
         if (catalog.shouldRefreshFavorites(parentId)) {
             scope.launch {
@@ -119,7 +119,7 @@ class PlaybackLibrarySessionCallback(
     override fun onGetLibraryRoot(
         session: MediaLibraryService.MediaLibrarySession,
         browser: MediaSession.ControllerInfo,
-        params: MediaLibraryService.LibraryParams?
+        params: MediaLibraryService.LibraryParams?,
     ): ListenableFuture<LibraryResult<MediaItem>> {
         val rootItem = MediaItem.Builder()
             .setMediaId(PlaybackContract.ROOT_ID)
@@ -129,7 +129,7 @@ class PlaybackLibrarySessionCallback(
                     .setIsPlayable(false)
                     .setIsBrowsable(true)
                     .setMediaType(MediaMetadata.MEDIA_TYPE_FOLDER_RADIO_STATIONS)
-                    .build()
+                    .build(),
             )
             .build()
         return Futures.immediateFuture(LibraryResult.ofItem(rootItem, params))
@@ -141,7 +141,7 @@ class PlaybackLibrarySessionCallback(
         parentId: String,
         page: Int,
         pageSize: Int,
-        params: MediaLibraryService.LibraryParams?
+        params: MediaLibraryService.LibraryParams?,
     ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
         if (catalog.shouldRefreshFavorites(parentId)) {
             scope.launch {
@@ -151,14 +151,14 @@ class PlaybackLibrarySessionCallback(
 
         val children = catalog.childrenForParent(context, parentId)
         return Futures.immediateFuture(
-            LibraryResult.ofItemList(ImmutableList.copyOf(children), params)
+            LibraryResult.ofItemList(ImmutableList.copyOf(children), params),
         )
     }
 
     override fun onGetItem(
         session: MediaLibraryService.MediaLibrarySession,
         browser: MediaSession.ControllerInfo,
-        mediaId: String
+        mediaId: String,
     ): ListenableFuture<LibraryResult<MediaItem>> {
         val station = catalog.findStationByMediaId(mediaId)
         return if (station != null) {
@@ -171,7 +171,7 @@ class PlaybackLibrarySessionCallback(
     override fun onAddMediaItems(
         mediaSession: MediaSession,
         controller: MediaSession.ControllerInfo,
-        mediaItems: MutableList<MediaItem>
+        mediaItems: MutableList<MediaItem>,
     ): ListenableFuture<MutableList<MediaItem>> {
         val requestedMediaId = mediaItems.firstOrNull()?.mediaId
             ?: return Futures.immediateFuture(mutableListOf())
@@ -185,7 +185,7 @@ class PlaybackLibrarySessionCallback(
         }
 
         val reorderedStations = selectedList.subList(selectedIndex, selectedList.size) +
-                selectedList.subList(0, selectedIndex)
+            selectedList.subList(0, selectedIndex)
         player.repeatMode = Player.REPEAT_MODE_ALL
         val prefix = catalog.prefixForList(selectedList)
         val resultItems = reorderedStations.map { it.toMediaItem(prefix) }.toMutableList()

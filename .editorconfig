@@ -1,0 +1,44 @@
+# Formatting rules for this project. ktlint reads this file directly, and so do
+# IntelliJ / Android Studio — one source of truth for the IDE and the build.
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 4
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.{kt,kts}]
+# ktlint ships three presets: ktlint_official, intellij_idea, android_studio.
+# android_studio matches what the IDE does out of the box for Android projects.
+ktlint_code_style = android_studio
+max_line_length = 120
+
+# Trailing commas keep diffs small when adding parameters/arguments.
+ij_kotlin_allow_trailing_comma = true
+ij_kotlin_allow_trailing_comma_on_call_site = true
+
+# @Composable functions are PascalCase by convention, which the naming rule
+# would otherwise flag. Test method names are free-form for readability.
+ktlint_function_naming_ignore_when_annotated_with = Composable, Test, ParameterizedTest
+
+# Leave function signatures laid out as written. Without this, ktlint collapses
+# multi-line composable parameter lists onto one line whenever they fit.
+ktlint_standard_function-signature = disabled
+
+# Existing package retrofit_errors_handler uses an underscore. Renaming it
+# would be a folder/import refactor, not a style fix.
+ktlint_standard_package-name = disabled
+
+# Filename must match the only class in the file. This project already has
+# names like SearchBarScrollBehavior.kt / Tabs.kt that we do not want to
+# keep renaming one by one.
+ktlint_standard_filename = disabled
+
+[*.{yml,yaml,json,xml}]
+indent_size = 2
+
+[*.md]
+trim_trailing_whitespace = false
