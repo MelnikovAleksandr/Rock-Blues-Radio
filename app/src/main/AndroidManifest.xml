@@ -29,7 +29,7 @@
             </intent-filter>
         </activity>
         <service
-            android:name=".presentation.service.PlaybackService"
+            android:name=".playback.PlaybackService"
             android:exported="true"
             android:foregroundServiceType="mediaPlayback"
             tools:ignore="ExportedService">

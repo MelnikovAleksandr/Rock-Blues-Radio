@@ -14,42 +14,38 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import dev.chrisbanes.haze.HazeState
 import ru.asmelnikov.rockbluesradio.domain.model.RadioStation
+import ru.asmelnikov.rockbluesradio.presentation.player.NowPlaying
 import ru.asmelnikov.rockbluesradio.presentation.screens.favorites.FavoritesScreen
-import ru.asmelnikov.rockbluesradio.presentation.screens.main.HomeScreen
+import ru.asmelnikov.rockbluesradio.presentation.screens.home.HomeScreen
 
 @Composable
 fun NavGraph(
     backStack: NavBackStack<NavKey>,
-    onItemsUpdate: (List<RadioStation>) -> Unit = {},
-    onRadioStationClick: (Int) -> Unit = {},
-    isPlayerSetUp: Boolean = false,
+    nowPlaying: NowPlaying,
     hazeState: HazeState,
-    currentPlayingStationId: String,
+    onPlayStation: (stations: List<RadioStation>, index: Int) -> Unit,
+    onPlaylistUpdate: (List<RadioStation>) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     NavDisplay(
-        modifier = Modifier
-            .fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         backStack = backStack,
         entryProvider = entryProvider {
-            entry<Routes.MainScreen> {
+            entry<Routes.Home> {
                 HomeScreen(
-                    navController = backStack,
-                    onRadioStationClick = onRadioStationClick,
-                    onItemsUpdate = onItemsUpdate,
-                    isPlayerSetUp = isPlayerSetUp,
+                    nowPlaying = nowPlaying,
                     hazeState = hazeState,
-                    currentPlayingStationId = currentPlayingStationId,
+                    onStationClick = onPlayStation,
+                    onFavoritesClick = { backStack.navigate(Routes.Favorites) },
                 )
             }
-
-            entry<Routes.FavoritesScreen> {
+            entry<Routes.Favorites> {
                 FavoritesScreen(
-                    isPlayerSetUp = isPlayerSetUp,
-                    navController = backStack,
-                    onFavoriteItemClick = onRadioStationClick,
-                    onItemsUpdate = onItemsUpdate,
+                    nowPlaying = nowPlaying,
                     hazeState = hazeState,
-                    currentPlayingStationId = currentPlayingStationId,
+                    onStationClick = onPlayStation,
+                    onPlaylistUpdate = onPlaylistUpdate,
+                    onBack = backStack::popUp,
                 )
             }
         },

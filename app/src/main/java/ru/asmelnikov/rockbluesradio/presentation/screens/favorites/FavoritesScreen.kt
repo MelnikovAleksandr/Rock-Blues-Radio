@@ -1,85 +1,69 @@
 package ru.asmelnikov.rockbluesradio.presentation.screens.favorites
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation3.runtime.NavBackStack
-import androidx.navigation3.runtime.NavKey
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.hazeSource
+import dev.chrisbanes.haze.rememberHazeState
 import org.koin.androidx.compose.koinViewModel
 import ru.asmelnikov.rockbluesradio.domain.model.RadioStation
-import ru.asmelnikov.rockbluesradio.presentation.components.FavoriteTopAppBar
-import ru.asmelnikov.rockbluesradio.presentation.components.RadioStationRow
-import ru.asmelnikov.rockbluesradio.presentation.navigation.popUp
+import ru.asmelnikov.rockbluesradio.presentation.components.station.StationList
+import ru.asmelnikov.rockbluesradio.presentation.components.topbar.FavoritesTopBar
+import ru.asmelnikov.rockbluesradio.presentation.player.NowPlaying
+import ru.asmelnikov.rockbluesradio.presentation.preview.PreviewData
+import ru.asmelnikov.rockbluesradio.presentation.theme.RockBluesRadioTheme
 
 @Composable
 fun FavoritesScreen(
-    isPlayerSetUp: Boolean,
+    nowPlaying: NowPlaying,
     hazeState: HazeState,
-    currentPlayingStationId: String,
+    onStationClick: (stations: List<RadioStation>, index: Int) -> Unit,
+    onPlaylistUpdate: (List<RadioStation>) -> Unit,
+    onBack: () -> Unit,
     viewModel: FavoritesViewModel = koinViewModel(),
-    navController: NavBackStack<NavKey>,
-    onItemsUpdate: (List<RadioStation>) -> Unit = {},
-    onFavoriteItemClick: (Int) -> Unit = {},
 ) {
-    val favoriteStations by viewModel.favorites.collectAsStateWithLifecycle()
+    val favorites by viewModel.favorites.collectAsStateWithLifecycle()
+    val currentOnPlaylistUpdate by rememberUpdatedState(onPlaylistUpdate)
+    val currentOnBack by rememberUpdatedState(onBack)
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(viewModel) {
         viewModel.events.collect { event ->
             when (event) {
-                is FavoritesEvent.OnItemsUpdate -> {
-                    onItemsUpdate(favoriteStations)
-                }
-                is FavoritesEvent.NavigateBack -> {
-                    navController.popUp()
-                }
+                is FavoritesEvent.FavoritesChanged -> currentOnPlaylistUpdate(event.favorites)
+                FavoritesEvent.NavigateBack -> currentOnBack()
             }
         }
     }
 
-    RadioStationList(
-        items = favoriteStations,
-        currentPlayingStationId = currentPlayingStationId,
-        isPlayerSetUp = isPlayerSetUp,
+    FavoritesContent(
+        favorites = favorites,
+        nowPlaying = nowPlaying,
         hazeState = hazeState,
-        onBackClick = {
-            navController.popUp()
-        },
-        onItemClick = { index ->
-            onItemsUpdate(favoriteStations)
-            onFavoriteItemClick(index)
-        },
-        onFavClick = {
-            viewModel.removeItem(it)
-        },
+        onStationClick = { index -> onStationClick(favorites, index) },
+        onFavoriteClick = viewModel::onFavoriteClick,
+        onBack = onBack,
     )
 }
 
 @Composable
-fun RadioStationList(
-    modifier: Modifier = Modifier,
-    items: List<RadioStation>,
-    isPlayerSetUp: Boolean,
-    currentPlayingStationId: String,
+fun FavoritesContent(
+    favorites: List<RadioStation>,
+    nowPlaying: NowPlaying,
     hazeState: HazeState,
-    onItemClick: (Int) -> Unit = {},
-    onBackClick: () -> Unit = {},
-    onFavClick: (RadioStation) -> Unit = {},
+    onStationClick: (index: Int) -> Unit,
+    onFavoriteClick: (RadioStation) -> Unit,
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Box(modifier = modifier.fillMaxSize()) {
         Box(
@@ -88,41 +72,36 @@ fun RadioStationList(
                 .background(MaterialTheme.colorScheme.background)
                 .fillMaxSize(),
         )
+        StationList(
+            stations = favorites,
+            nowPlaying = nowPlaying,
+            hazeState = hazeState,
+            onStationClick = onStationClick,
+            onFavoriteClick = onFavoriteClick,
+            stickyHeader = {
+                FavoritesTopBar(hazeState = hazeState, onBack = onBack)
+            },
+        )
+    }
+}
 
-        LazyColumn(
-            modifier = Modifier,
+@Preview(locale = "ru")
+@Composable
+private fun FavoritesContentPreview() {
+    RockBluesRadioTheme {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.background),
         ) {
-            stickyHeader {
-                FavoriteTopAppBar(
-                    hazeState = hazeState,
-                ) {
-                    onBackClick()
-                }
-            }
-
-            items(items = items, key = { it.id }) { item ->
-                RadioStationRow(
-                    modifier = Modifier
-                        .hazeSource(state = hazeState)
-                        .animateItem()
-                        .clickable {
-                            onItemClick(items.indexOf(item))
-                        }
-                        .fillMaxWidth(),
-                    item = item,
-                    currentPlayingStationId = currentPlayingStationId,
-                    isFavorite = item.isFavorite,
-                    onFavClick = onFavClick,
-                )
-            }
-            item {
-                Spacer(modifier = Modifier.navigationBarsPadding())
-            }
-            if (isPlayerSetUp) {
-                item {
-                    Spacer(modifier = Modifier.height(60.dp))
-                }
-            }
+            FavoritesContent(
+                favorites = PreviewData.stations().map { it.copy(isFavorite = true) },
+                nowPlaying = NowPlaying(),
+                hazeState = rememberHazeState(),
+                onStationClick = {},
+                onFavoriteClick = {},
+                onBack = {},
+            )
         }
     }
 }

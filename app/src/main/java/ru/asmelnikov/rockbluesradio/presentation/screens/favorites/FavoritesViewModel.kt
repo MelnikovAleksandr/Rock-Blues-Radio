@@ -2,49 +2,50 @@ package ru.asmelnikov.rockbluesradio.presentation.screens.favorites
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import ru.asmelnikov.rockbluesradio.domain.model.RadioStation
-import ru.asmelnikov.rockbluesradio.domain.usecase.AddToOrRemoveFromFavoritesUseCase
-import ru.asmelnikov.rockbluesradio.domain.usecase.GetFavoriteRadioStationsUseCase
+import ru.asmelnikov.rockbluesradio.domain.usecase.ObserveFavoriteStationsUseCase
+import ru.asmelnikov.rockbluesradio.domain.usecase.ToggleFavoriteUseCase
 
 class FavoritesViewModel(
-    private val getFavoriteRadioStationsUseCase: GetFavoriteRadioStationsUseCase,
-    private val addToOrRemoveFromFavoritesUseCase: AddToOrRemoveFromFavoritesUseCase,
+    observeFavoriteStations: ObserveFavoriteStationsUseCase,
+    private val toggleFavorite: ToggleFavoriteUseCase,
 ) : ViewModel() {
+
     private val _favorites = MutableStateFlow<List<RadioStation>>(emptyList())
-    val favorites = _favorites.asStateFlow()
+    val favorites: StateFlow<List<RadioStation>> = _favorites.asStateFlow()
 
     private val _events = MutableSharedFlow<FavoritesEvent>()
-    val events = _events.asSharedFlow()
+    val events: SharedFlow<FavoritesEvent> = _events.asSharedFlow()
 
     init {
-        viewModelScope.launch(Dispatchers.IO) {
-            getFavoriteRadioStationsUseCase.execute()
-                .distinctUntilChanged()
-                .collect {
-                    _favorites.emit(it)
-                    _events.emit(FavoritesEvent.OnItemsUpdate)
-                    if (it.isEmpty()) {
-                        _events.emit(FavoritesEvent.NavigateBack)
-                    }
+        observeFavoriteStations()
+            .distinctUntilChanged()
+            .onEach { favorites ->
+                _favorites.value = favorites
+                _events.emit(FavoritesEvent.FavoritesChanged(favorites))
+                if (favorites.isEmpty()) {
+                    _events.emit(FavoritesEvent.NavigateBack)
                 }
-        }
+            }
+            .launchIn(viewModelScope)
     }
 
-    fun removeItem(item: RadioStation) {
-        viewModelScope.launch(Dispatchers.IO) {
-            addToOrRemoveFromFavoritesUseCase.execute(item)
-        }
+    fun onFavoriteClick(station: RadioStation) {
+        viewModelScope.launch { toggleFavorite(station) }
     }
 }
 
-sealed class FavoritesEvent {
-    data object OnItemsUpdate : FavoritesEvent()
-    data object NavigateBack : FavoritesEvent()
+sealed interface FavoritesEvent {
+    data class FavoritesChanged(val favorites: List<RadioStation>) : FavoritesEvent
+    data object NavigateBack : FavoritesEvent
 }
