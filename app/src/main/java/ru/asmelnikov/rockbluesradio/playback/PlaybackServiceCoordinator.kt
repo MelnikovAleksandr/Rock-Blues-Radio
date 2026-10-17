@@ -1,14 +1,12 @@
 package ru.asmelnikov.rockbluesradio.playback
 
 import android.content.Context
-import androidx.annotation.OptIn
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
-import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.MediaLibraryService.MediaLibrarySession
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import ru.asmelnikov.rockbluesradio.domain.model.RadioStation
 import ru.asmelnikov.rockbluesradio.domain.usecase.ObserveFavoriteStationsUseCase
 
 class PlaybackServiceCoordinator(
@@ -20,39 +18,28 @@ class PlaybackServiceCoordinator(
     private val sessionProvider: () -> MediaLibrarySession?,
 ) {
     fun start() {
-        loadCatalog()
-        observeFavorites()
+        scope.launch {
+            catalog.load()
+            notifyAllFoldersChanged()
+            updateFavoriteButton()
+            observeFavorites()
+        }
         observeMediaItemTransitions()
     }
 
-    @OptIn(UnstableApi::class)
-    fun updateFavoriteButton() {
-        sessionProvider()?.setMediaButtonPreferences(
-            FavoriteCommandButton.preferences(context, player.currentMediaItem, catalog.favoriteStations),
-        )
-    }
-
-    private fun loadCatalog() {
-        scope.launch {
-            catalog.load()
+    private suspend fun observeFavorites() {
+        observeFavoriteStations().collect { favorites ->
+            catalog.setFavorites(favorites)
+            syncFavoritesQueue(favorites)
+            notifyChildrenChanged(PlaybackContract.ROOT_ID)
+            notifyChildrenChanged(StationFolder.Favorites.mediaId)
             updateFavoriteButton()
         }
     }
 
-    private fun observeFavorites() {
-        scope.launch {
-            observeFavoriteStations().collectLatest { favorites ->
-                val rootCountBefore = catalog.rootChildrenCount()
-                catalog.setFavorites(favorites)
-
-                val session = sessionProvider()
-                session?.notifyChildrenChanged(PlaybackContract.FAVORITES, favorites.size, null)
-                val rootCountAfter = catalog.rootChildrenCount()
-                if (rootCountBefore != rootCountAfter) {
-                    session?.notifyChildrenChanged(PlaybackContract.ROOT_ID, rootCountAfter, null)
-                }
-                updateFavoriteButton()
-            }
+    private fun syncFavoritesQueue(favorites: List<RadioStation>) {
+        if (PlaybackContract.folderOf(player.currentMediaItem?.mediaId) == StationFolder.Favorites) {
+            player.replaceQueueAroundCurrentItem(favorites.toMediaItems(StationFolder.Favorites))
         }
     }
 
@@ -63,6 +50,21 @@ class PlaybackServiceCoordinator(
                     updateFavoriteButton()
                 }
             },
+        )
+    }
+
+    private fun notifyAllFoldersChanged() {
+        notifyChildrenChanged(PlaybackContract.ROOT_ID)
+        StationFolder.entries.forEach { notifyChildrenChanged(it.mediaId) }
+    }
+
+    private fun notifyChildrenChanged(parentId: String) {
+        sessionProvider()?.notifyChildrenChanged(parentId, catalog.childCount(parentId), null)
+    }
+
+    private fun updateFavoriteButton() {
+        sessionProvider()?.setMediaButtonPreferences(
+            FavoriteCommandButton.preferences(context, player.currentMediaItem, catalog.favoriteStations),
         )
     }
 }

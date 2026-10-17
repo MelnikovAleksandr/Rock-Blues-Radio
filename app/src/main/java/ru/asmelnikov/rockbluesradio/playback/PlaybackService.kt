@@ -30,7 +30,6 @@ class PlaybackService : MediaLibraryService() {
             player = player,
             catalog = catalog,
             toggleFavorite = toggleFavorite,
-            sessionProvider = { mediaLibrarySession },
         )
         mediaLibrarySession = MediaLibrarySession.Builder(this, player, callback)
             .setPeriodicPositionUpdateEnabled(false)

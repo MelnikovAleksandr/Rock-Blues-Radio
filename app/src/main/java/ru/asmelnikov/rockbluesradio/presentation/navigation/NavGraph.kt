@@ -14,6 +14,7 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import dev.chrisbanes.haze.HazeState
 import ru.asmelnikov.rockbluesradio.domain.model.RadioStation
+import ru.asmelnikov.rockbluesradio.playback.StationFolder
 import ru.asmelnikov.rockbluesradio.presentation.player.NowPlaying
 import ru.asmelnikov.rockbluesradio.presentation.screens.favorites.FavoritesScreen
 import ru.asmelnikov.rockbluesradio.presentation.screens.home.HomeScreen
@@ -23,8 +24,7 @@ fun NavGraph(
     backStack: NavBackStack<NavKey>,
     nowPlaying: NowPlaying,
     hazeState: HazeState,
-    onPlayStation: (stations: List<RadioStation>, index: Int) -> Unit,
-    onPlaylistUpdate: (List<RadioStation>) -> Unit,
+    onPlayStation: (folder: StationFolder, stations: List<RadioStation>, index: Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     NavDisplay(
@@ -35,7 +35,9 @@ fun NavGraph(
                 HomeScreen(
                     nowPlaying = nowPlaying,
                     hazeState = hazeState,
-                    onStationClick = onPlayStation,
+                    onStationClick = { genre, stations, index ->
+                        onPlayStation(StationFolder.of(genre), stations, index)
+                    },
                     onFavoritesClick = { backStack.navigate(Routes.Favorites) },
                 )
             }
@@ -43,8 +45,9 @@ fun NavGraph(
                 FavoritesScreen(
                     nowPlaying = nowPlaying,
                     hazeState = hazeState,
-                    onStationClick = onPlayStation,
-                    onPlaylistUpdate = onPlaylistUpdate,
+                    onStationClick = { stations, index ->
+                        onPlayStation(StationFolder.Favorites, stations, index)
+                    },
                     onBack = backStack::popUp,
                 )
             }

@@ -7,7 +7,7 @@ import ru.asmelnikov.rockbluesradio.domain.model.RadioStation
 
 private const val GENRES_SEPARATOR = "|"
 
-fun RadioStation.toMediaItem(folderId: String = ""): MediaItem {
+fun RadioStation.toMediaItem(folder: StationFolder): MediaItem {
     val metadata = MediaMetadata.Builder()
         .setDisplayTitle(name)
         .setArtworkUri(faviconUrl.toUri())
@@ -17,7 +17,9 @@ fun RadioStation.toMediaItem(folderId: String = ""): MediaItem {
         .build()
     return MediaItem.Builder()
         .setUri(streamUrl)
-        .setMediaId(PlaybackContract.mediaId(folderId, id))
+        .setMediaId(PlaybackContract.stationMediaId(folder, id))
         .setMediaMetadata(metadata)
         .build()
 }
+
+fun List<RadioStation>.toMediaItems(folder: StationFolder): List<MediaItem> = map { it.toMediaItem(folder) }

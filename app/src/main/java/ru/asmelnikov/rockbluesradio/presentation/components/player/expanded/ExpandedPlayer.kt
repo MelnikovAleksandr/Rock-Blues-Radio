@@ -2,6 +2,7 @@ package ru.asmelnikov.rockbluesradio.presentation.components.player.expanded
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.interaction.DragInteraction
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -25,7 +26,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,12 +36,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import androidx.media3.common.MediaItem
+import kotlin.math.abs
 import kotlin.math.absoluteValue
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.launch
 import ru.asmelnikov.rockbluesradio.presentation.components.common.StationArtwork
 import ru.asmelnikov.rockbluesradio.presentation.player.PlayerState
-import ru.asmelnikov.rockbluesradio.presentation.player.mediaItems
 import ru.asmelnikov.rockbluesradio.presentation.preview.PreviewData
 import ru.asmelnikov.rockbluesradio.presentation.theme.RockBluesRadioTheme
 import ru.asmelnikov.rockbluesradio.presentation.theme.dimens
@@ -52,45 +54,60 @@ private const val INACTIVE_ARTWORK_SCALE = 0.75f
 fun ExpandedPlayer(
     playerState: PlayerState,
     onCollapse: () -> Unit,
-    onPrevious: () -> Unit,
-    onNext: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val player = playerState.player
-    val mediaItems = remember(player.mediaItemCount) { player.mediaItems }
+    val mediaItems = playerState.mediaItems
     val currentIndex = playerState.mediaItemIndex
     val pagerState = rememberPagerState(initialPage = currentIndex) { mediaItems.size }
 
-    LaunchedEffect(currentIndex) {
-        if (currentIndex in mediaItems.indices && pagerState.currentPage != currentIndex) {
-            pagerState.animateScrollToPage(currentIndex)
-        }
-    }
-
-    LaunchedEffect(pagerState) {
-        snapshotFlow { pagerState.currentPage }
-            .distinctUntilChanged()
-            .drop(1)
-            .collect { page ->
-                val playerIndex = playerState.mediaItemIndex
-                if (page != playerIndex && page in mediaItems.indices) {
-                    if (page > playerIndex) onNext() else onPrevious()
-                }
-            }
-    }
+    PagerFollowsPlayerEffect(pagerState = pagerState, playerIndex = currentIndex, pageCount = mediaItems.size)
+    PlayerFollowsUserSwipeEffect(pagerState = pagerState, onPageSelected = playerState::skipTo)
 
     ExpandedPlayerContent(
         modifier = modifier,
         pagerState = pagerState,
         mediaItems = mediaItems,
-        title = playerState.currentMediaItem?.mediaMetadata?.displayTitle.toString(),
+        title = playerState.currentMediaItem?.mediaMetadata?.displayTitle?.toString().orEmpty(),
         isPlaying = playerState.isPlaying,
         isBuffering = playerState.isBuffering,
-        onPlayPauseClick = { player.playWhenReady = !player.playWhenReady },
+        onPlayPauseClick = playerState::togglePlayPause,
         onCollapse = onCollapse,
-        onPrevious = onPrevious,
-        onNext = onNext,
+        onPrevious = playerState::skipToPrevious,
+        onNext = playerState::skipToNext,
     )
+}
+
+@Composable
+private fun PagerFollowsPlayerEffect(pagerState: PagerState, playerIndex: Int, pageCount: Int) {
+    LaunchedEffect(playerIndex, pageCount) {
+        if (playerIndex !in 0 until pageCount || pagerState.currentPage == playerIndex) return@LaunchedEffect
+        if (abs(pagerState.currentPage - playerIndex) > 1) {
+            pagerState.scrollToPage(playerIndex)
+        } else {
+            pagerState.animateScrollToPage(playerIndex)
+        }
+    }
+}
+
+@Composable
+private fun PlayerFollowsUserSwipeEffect(pagerState: PagerState, onPageSelected: (Int) -> Unit) {
+    val currentOnPageSelected by rememberUpdatedState(onPageSelected)
+    LaunchedEffect(pagerState) {
+        var isScrolledByUser = false
+        launch {
+            pagerState.interactionSource.interactions.collect { interaction ->
+                if (interaction is DragInteraction.Start) isScrolledByUser = true
+            }
+        }
+        snapshotFlow { pagerState.isScrollInProgress }
+            .filter { inProgress -> !inProgress }
+            .collect {
+                if (isScrolledByUser) {
+                    isScrolledByUser = false
+                    currentOnPageSelected(pagerState.currentPage)
+                }
+            }
+    }
 }
 
 @Composable

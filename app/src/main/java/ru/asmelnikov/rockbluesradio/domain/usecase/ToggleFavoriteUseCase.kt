@@ -6,10 +6,6 @@ import ru.asmelnikov.rockbluesradio.domain.repository.RadioStationRepository
 class ToggleFavoriteUseCase(private val repository: RadioStationRepository) {
 
     suspend operator fun invoke(station: RadioStation) {
-        if (repository.isFavorite(station.id)) {
-            repository.removeFromFavorites(station)
-        } else {
-            repository.addToFavorites(station)
-        }
+        repository.toggleFavorite(station)
     }
 }

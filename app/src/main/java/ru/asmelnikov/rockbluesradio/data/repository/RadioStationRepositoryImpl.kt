@@ -21,13 +21,7 @@ class RadioStationRepositoryImpl(
     override fun observeFavoriteStations(): Flow<List<RadioStation>> =
         favoriteStationDao.observeAll().map { entities -> entities.map { it.toDomain() } }
 
-    override suspend fun isFavorite(stationId: String): Boolean = favoriteStationDao.exists(stationId)
-
-    override suspend fun addToFavorites(station: RadioStation) {
-        favoriteStationDao.insert(station.toFavoriteEntity())
-    }
-
-    override suspend fun removeFromFavorites(station: RadioStation) {
-        favoriteStationDao.delete(station.toFavoriteEntity())
+    override suspend fun toggleFavorite(station: RadioStation) {
+        favoriteStationDao.toggle(station.toFavoriteEntity())
     }
 }

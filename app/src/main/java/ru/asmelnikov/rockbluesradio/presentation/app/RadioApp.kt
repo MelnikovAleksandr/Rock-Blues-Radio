@@ -30,13 +30,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.media3.common.Player
 import androidx.navigation3.runtime.rememberNavBackStack
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.rememberHazeState
 import ru.asmelnikov.rockbluesradio.R
-import ru.asmelnikov.rockbluesradio.domain.model.RadioStation
-import ru.asmelnikov.rockbluesradio.playback.toMediaItem
 import ru.asmelnikov.rockbluesradio.presentation.components.dialog.NoInternetDialog
 import ru.asmelnikov.rockbluesradio.presentation.components.player.MiniPlayer
 import ru.asmelnikov.rockbluesradio.presentation.components.player.expanded.ExpandedPlayerSheet
@@ -44,37 +41,24 @@ import ru.asmelnikov.rockbluesradio.presentation.navigation.NavGraph
 import ru.asmelnikov.rockbluesradio.presentation.navigation.Routes
 import ru.asmelnikov.rockbluesradio.presentation.player.NowPlaying
 import ru.asmelnikov.rockbluesradio.presentation.player.PlayerState
-import ru.asmelnikov.rockbluesradio.presentation.player.playMediaAt
-import ru.asmelnikov.rockbluesradio.presentation.player.rememberManagedMediaController
+import ru.asmelnikov.rockbluesradio.presentation.player.rememberMediaController
 import ru.asmelnikov.rockbluesradio.presentation.player.rememberPlayerState
-import ru.asmelnikov.rockbluesradio.presentation.player.togglePlayPause
-import ru.asmelnikov.rockbluesradio.presentation.player.updatePlaylist
 import ru.asmelnikov.rockbluesradio.presentation.theme.dimens
 
 private const val MINI_PLAYER_ANIMATION_MILLIS = 300
 
 @Composable
 fun RadioApp(viewModel: MainViewModel) {
-    val isPlayerSetUp by viewModel.isPlayerSetUp.collectAsStateWithLifecycle()
     val isConnected by viewModel.isConnected.collectAsStateWithLifecycle()
-    val mediaController by rememberManagedMediaController()
-    val playerState = rememberPlayerState(mediaController)
+    val playerState = rememberPlayerState(rememberMediaController())
 
     val backStack = rememberNavBackStack(Routes.Home)
     val snackbarHostState = remember { SnackbarHostState() }
     val hazeState = rememberHazeState()
     var isExpandedPlayerOpen by rememberSaveable { mutableStateOf(false) }
+    val hasMediaItem = playerState?.currentMediaItem != null
 
-    PlaybackRestoreEffect(
-        player = mediaController,
-        isPlayerSetUp = isPlayerSetUp,
-        onActivePlaybackFound = viewModel::setUpPlayer,
-    )
-    PlayerErrorEffect(
-        playerState = playerState,
-        snackbarHostState = snackbarHostState,
-        onRetry = { mediaController?.prepare() },
-    )
+    PlayerErrorEffect(playerState = playerState, snackbarHostState = snackbarHostState)
 
     Scaffold(
         modifier = Modifier
@@ -95,8 +79,6 @@ fun RadioApp(viewModel: MainViewModel) {
         if (isExpandedPlayerOpen && playerState != null) {
             ExpandedPlayerSheet(
                 playerState = playerState,
-                onPrevious = { mediaController?.seekToPreviousMediaItem() },
-                onNext = { mediaController?.seekToNextMediaItem() },
                 onDismiss = { isExpandedPlayerOpen = false },
             )
         }
@@ -110,23 +92,16 @@ fun RadioApp(viewModel: MainViewModel) {
                 backStack = backStack,
                 nowPlaying = NowPlaying(
                     stationId = playerState?.playingStationId,
-                    isPlayerSetUp = isPlayerSetUp,
+                    isMiniPlayerVisible = hasMediaItem,
                 ),
                 hazeState = hazeState,
-                onPlayStation = { stations, index ->
-                    mediaController?.updatePlaylist(stations.toMediaItems())
-                    if (!isPlayerSetUp) {
-                        viewModel.setUpPlayer()
-                    }
-                    mediaController?.playMediaAt(index)
-                },
-                onPlaylistUpdate = { stations ->
-                    mediaController?.updatePlaylist(stations.toMediaItems())
+                onPlayStation = { folder, stations, index ->
+                    playerState?.playStation(folder, stations, index)
                 },
             )
             MiniPlayerBar(
                 modifier = Modifier.align(Alignment.BottomCenter),
-                visible = isPlayerSetUp && !isExpandedPlayerOpen && playerState?.currentMediaItem != null,
+                visible = hasMediaItem && !isExpandedPlayerOpen,
                 playerState = playerState,
                 hazeState = hazeState,
                 onClick = { isExpandedPlayerOpen = true },
@@ -136,30 +111,7 @@ fun RadioApp(viewModel: MainViewModel) {
 }
 
 @Composable
-private fun PlaybackRestoreEffect(
-    player: Player?,
-    isPlayerSetUp: Boolean,
-    onActivePlaybackFound: () -> Unit,
-) {
-    LaunchedEffect(player) {
-        if (player != null && (player.playWhenReady || player.playbackState == Player.STATE_READY)) {
-            onActivePlaybackFound()
-        }
-    }
-    LaunchedEffect(isPlayerSetUp) {
-        if (isPlayerSetUp && player != null && player.mediaItemCount > 0) {
-            player.prepare()
-            player.play()
-        }
-    }
-}
-
-@Composable
-private fun PlayerErrorEffect(
-    playerState: PlayerState?,
-    snackbarHostState: SnackbarHostState,
-    onRetry: () -> Unit,
-) {
+private fun PlayerErrorEffect(playerState: PlayerState?, snackbarHostState: SnackbarHostState) {
     val errorMessage = stringResource(R.string.error)
     val retryLabel = stringResource(R.string.error_retry)
     val playerError = playerState?.playerError
@@ -172,7 +124,7 @@ private fun PlayerErrorEffect(
             withDismissAction = true,
         )
         if (result == SnackbarResult.ActionPerformed) {
-            onRetry()
+            playerState?.retry()
         }
     }
 }
@@ -208,10 +160,8 @@ private fun MiniPlayerBar(
                 isPlaying = state.isPlaying,
                 isBuffering = state.isBuffering,
                 hazeState = hazeState,
-                onPlayPauseClick = state.player::togglePlayPause,
+                onPlayPauseClick = state::togglePlayPause,
             )
         }
     }
 }
-
-private fun List<RadioStation>.toMediaItems() = map { it.toMediaItem() }
