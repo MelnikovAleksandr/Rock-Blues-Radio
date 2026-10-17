@@ -1,5 +1,6 @@
 package ru.asmelnikov.rockbluesradio.presentation.app
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -11,6 +12,7 @@ import org.junit.Test
 import ru.asmelnikov.rockbluesradio.domain.connectivity.ConnectivityObserver
 import ru.asmelnikov.rockbluesradio.testing.MainDispatcherRule
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class MainViewModelTest {
 
     @get:Rule

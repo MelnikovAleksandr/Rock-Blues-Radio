@@ -1,5 +1,6 @@
 package ru.asmelnikov.rockbluesradio.domain.usecase
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
@@ -13,6 +14,7 @@ import ru.asmelnikov.rockbluesradio.domain.model.Genre
 import ru.asmelnikov.rockbluesradio.testing.FakeRadioStationRepository
 import ru.asmelnikov.rockbluesradio.testing.testStation
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class ObserveStationsByGenreUseCaseTest {
 
     private val rock = listOf(testStation("r1"), testStation("r2"), testStation("r3"))
