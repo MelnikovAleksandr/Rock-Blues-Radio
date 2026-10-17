@@ -20,9 +20,8 @@ fun HomeScreen(
     onItemsUpdate: (List<RadioStation>) -> Unit = {},
     isPlayerSetUp: Boolean = false,
     hazeState: HazeState,
-    currentPlayingStationId: String
+    currentPlayingStationId: String,
 ) {
-
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     RadioStationList(
@@ -39,6 +38,6 @@ fun HomeScreen(
         },
         onFavClick = {
             viewModel.addOrRemoteFavorites(it)
-        }
+        },
     )
 }

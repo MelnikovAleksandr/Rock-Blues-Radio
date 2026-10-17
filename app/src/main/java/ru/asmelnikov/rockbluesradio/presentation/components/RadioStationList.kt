@@ -41,7 +41,7 @@ fun RadioStationList(
     isPlayerSetUp: Boolean,
     onItemClick: (List<RadioStation>, Int) -> Unit = { _, _ -> },
     onFavoritesClick: () -> Unit = {},
-    onFavClick: (RadioStation) -> Unit = {}
+    onFavClick: (RadioStation) -> Unit = {},
 ) {
     val pagerState = rememberPagerState(initialPage = 0) { 2 }
     val scope = rememberCoroutineScope()
@@ -56,7 +56,7 @@ fun RadioStationList(
                 HomeTitleBar(
                     hazeState = hazeState,
                     favoritesEnabled = state.showFavoritesButton,
-                    onFavClick = onFavoritesClick
+                    onFavClick = onFavoritesClick,
                 )
                 GenrePagerSwitcher(
                     modifier = Modifier,
@@ -67,20 +67,20 @@ fun RadioStationList(
                     },
                     onBluesClick = {
                         scope.launch { pagerState.animateScrollToPage(1) }
-                    }
+                    },
                 )
             }
-        }
+        },
     ) { innerPadding ->
         Box(
             modifier = Modifier
                 .hazeSource(state = hazeState)
                 .background(MaterialTheme.colorScheme.background)
-                .fillMaxSize()
+                .fillMaxSize(),
         ) {
             HorizontalPager(
                 modifier = Modifier.fillMaxSize(),
-                state = pagerState
+                state = pagerState,
             ) { page ->
                 val items = remember(page, state.rockItems, state.bluesItems) {
                     if (page == 0) state.rockItems else state.bluesItems
@@ -89,8 +89,8 @@ fun RadioStationList(
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(
                         top = innerPadding.calculateTopPadding(),
-                        bottom = innerPadding.calculateBottomPadding()
-                    )
+                        bottom = innerPadding.calculateBottomPadding(),
+                    ),
                 ) {
                     itemsIndexed(items = items, key = { _, item -> item.id }) { index, item ->
                         RadioStationRow(
@@ -102,7 +102,7 @@ fun RadioStationList(
                             item = item,
                             currentPlayingStationId = currentPlayingStationId,
                             isFavorite = item.isFavorite,
-                            onFavClick = onFavClick
+                            onFavClick = onFavClick,
                         )
                     }
 
@@ -125,20 +125,20 @@ fun RadioStationListPreview1(modifier: Modifier = Modifier) {
         Box(
             modifier = modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.background)
+                .background(MaterialTheme.colorScheme.background),
         ) {
             RadioStationList(
                 state = ScreenState(
                     rockItems = mockRadioStations(),
                     bluesItems = mockRadioStations(),
-                    showFavoritesButton = true
+                    showFavoritesButton = true,
                 ),
                 hazeState = rememberHazeState(),
                 currentPlayingStationId = "",
                 isPlayerSetUp = false,
                 onItemClick = { _, _ -> },
                 onFavoritesClick = {},
-                onFavClick = {}
+                onFavClick = {},
             )
         }
     }
@@ -152,20 +152,20 @@ fun RadioStationListPreview2(modifier: Modifier = Modifier) {
         Box(
             modifier = modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.background)
+                .background(MaterialTheme.colorScheme.background),
         ) {
             RadioStationList(
                 state = ScreenState(
                     rockItems = mockRadioStations(),
                     bluesItems = mockRadioStations(),
-                    showFavoritesButton = false
+                    showFavoritesButton = false,
                 ),
                 hazeState = rememberHazeState(),
                 currentPlayingStationId = "",
                 isPlayerSetUp = false,
                 onItemClick = { _, _ -> },
                 onFavoritesClick = {},
-                onFavClick = {}
+                onFavClick = {},
             )
         }
     }

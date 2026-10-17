@@ -12,7 +12,7 @@ object FavoriteButtonProvider {
     fun create(
         context: Context,
         currentMediaItem: MediaItem?,
-        favoriteStations: List<RadioStation>
+        favoriteStations: List<RadioStation>,
     ): CommandButton {
         val isFavorite = currentMediaItem?.mediaId?.let { mediaId ->
             val stationId = mediaId.substringAfter("_")
@@ -29,8 +29,8 @@ object FavoriteButtonProvider {
             .setSessionCommand(
                 SessionCommand(
                     PlaybackContract.COMMAND_TOGGLE_FAVORITE,
-                    Bundle.EMPTY
-                )
+                    Bundle.EMPTY,
+                ),
             )
             .setDisplayName(context.getString(R.string.add_remove_favorite))
             .build()

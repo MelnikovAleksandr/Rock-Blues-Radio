@@ -99,9 +99,9 @@ class MainActivity : ComponentActivity() {
                     snackbarHost = {
                         SnackbarHost(
                             hostState = snackbarHostState,
-                            modifier = Modifier.navigationBarsPadding()
+                            modifier = Modifier.navigationBarsPadding(),
                         )
-                    }
+                    },
                 ) { innerPadding ->
 
                     LaunchedEffect(mediaController) {
@@ -143,7 +143,7 @@ class MainActivity : ComponentActivity() {
                             val result = snackbarHostState.showSnackbar(
                                 message = "$errorMessage ${exception.message}, Code: ${exception.errorCode}",
                                 withDismissAction = true,
-                                actionLabel = retryMessage
+                                actionLabel = retryMessage,
                             )
                             if (result == SnackbarResult.ActionPerformed) {
                                 mediaController?.prepare()
@@ -170,7 +170,7 @@ class MainActivity : ComponentActivity() {
                             sheetState = sheetState,
                             contentWindowInsets = { WindowInsets(0) },
                             dragHandle = null,
-                            sheetMaxWidth = Dp.Unspecified
+                            sheetMaxWidth = Dp.Unspecified,
                         ) {
                             playerState?.let {
                                 ExpandedPlayerView(
@@ -190,7 +190,7 @@ class MainActivity : ComponentActivity() {
                                     },
                                     onNextClick = {
                                         mediaController?.seekToNextMediaItem()
-                                    }
+                                    },
                                 )
                             }
                         }
@@ -199,7 +199,7 @@ class MainActivity : ComponentActivity() {
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(innerPadding)
+                            .padding(innerPadding),
                     ) {
                         NavGraph(
                             backStack = navController,
@@ -214,22 +214,28 @@ class MainActivity : ComponentActivity() {
                             },
                             isPlayerSetUp = isPlayerSetUp,
                             hazeState = hazeState,
-                            currentPlayingStationId = playerState?.takeIf { it.isPlaying }?.currentMediaItem?.mediaId?.substringAfter("_") ?: ""
+                            currentPlayingStationId =
+                            playerState?.takeIf { it.isPlaying }?.currentMediaItem?.mediaId?.substringAfter("_")
+                                ?: "",
                         )
                         AnimatedVisibility(
                             modifier = Modifier
                                 .align(Alignment.BottomCenter)
                                 .padding(dimens.extraSmall2)
                                 .navigationBarsPadding(),
-                            visible = isPlayerSetUp && playerState != null && !openBottomSheet && playerState?.currentMediaItem != null,
+                            visible =
+                            isPlayerSetUp &&
+                                playerState != null &&
+                                !openBottomSheet &&
+                                playerState?.currentMediaItem != null,
                             enter = slideInVertically(
                                 initialOffsetY = { it },
-                                animationSpec = tween(durationMillis = 300)
+                                animationSpec = tween(durationMillis = 300),
                             ) + fadeIn(),
                             exit = slideOutVertically(
                                 targetOffsetY = { it },
-                                animationSpec = tween(durationMillis = 300)
-                            ) + fadeOut()
+                                animationSpec = tween(durationMillis = 300),
+                            ) + fadeOut(),
                         ) {
                             playerState?.let { safeState ->
                                 CompactPlayerView(
@@ -243,14 +249,16 @@ class MainActivity : ComponentActivity() {
                                     isPlaying = safeState.isPlaying,
                                     hazeState = hazeState,
                                     onPlayPauseClick = {
-                                        if (safeState.player.playbackState == Player.STATE_IDLE && safeState.currentMediaItem != null) {
+                                        if (safeState.player.playbackState == Player.STATE_IDLE &&
+                                            safeState.currentMediaItem != null
+                                        ) {
                                             safeState.player.prepare()
                                             safeState.player.play()
                                         } else {
                                             safeState.player.playWhenReady =
                                                 !safeState.player.playWhenReady
                                         }
-                                    }
+                                    },
                                 )
                             }
                         }

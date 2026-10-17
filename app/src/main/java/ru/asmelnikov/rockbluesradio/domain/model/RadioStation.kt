@@ -8,5 +8,5 @@ data class RadioStation(
     val url: Uri,
     val favicon: Uri,
     val isFavorite: Boolean,
-    val genres: List<String>
+    val genres: List<String>,
 )

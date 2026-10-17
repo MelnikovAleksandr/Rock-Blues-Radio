@@ -24,7 +24,7 @@ fun NavGraph(
     onRadioStationClick: (Int) -> Unit = {},
     isPlayerSetUp: Boolean = false,
     hazeState: HazeState,
-    currentPlayingStationId: String
+    currentPlayingStationId: String,
 ) {
     NavDisplay(
         modifier = Modifier
@@ -38,7 +38,7 @@ fun NavGraph(
                     onItemsUpdate = onItemsUpdate,
                     isPlayerSetUp = isPlayerSetUp,
                     hazeState = hazeState,
-                    currentPlayingStationId = currentPlayingStationId
+                    currentPlayingStationId = currentPlayingStationId,
                 )
             }
 
@@ -49,26 +49,25 @@ fun NavGraph(
                     onFavoriteItemClick = onRadioStationClick,
                     onItemsUpdate = onItemsUpdate,
                     hazeState = hazeState,
-                    currentPlayingStationId = currentPlayingStationId
+                    currentPlayingStationId = currentPlayingStationId,
                 )
             }
-
         },
         transitionSpec = {
             slideInHorizontally(initialOffsetX = { it }) togetherWith
-                    slideOutHorizontally(targetOffsetX = { -it })
+                slideOutHorizontally(targetOffsetX = { -it })
         },
         popTransitionSpec = {
             slideInHorizontally(initialOffsetX = { -it }) togetherWith
-                    slideOutHorizontally(targetOffsetX = { it })
+                slideOutHorizontally(targetOffsetX = { it })
         },
         predictivePopTransitionSpec = {
             slideInHorizontally(initialOffsetX = { -it }) togetherWith
-                    slideOutHorizontally(targetOffsetX = { it })
+                slideOutHorizontally(targetOffsetX = { it })
         },
         entryDecorators = listOf(
             rememberSaveableStateHolderNavEntryDecorator(),
-            rememberViewModelStoreNavEntryDecorator()
-        )
+            rememberViewModelStoreNavEntryDecorator(),
+        ),
     )
 }

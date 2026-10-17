@@ -25,12 +25,10 @@ object PlaybackPlayerFactory {
 
 object PlaybackSessionActivityFactory {
     @OptIn(ExperimentalMaterial3Api::class)
-    fun create(context: Context): PendingIntent {
-        return PendingIntent.getActivity(
-            context,
-            0,
-            Intent(context, MainActivity::class.java),
-            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-        )
-    }
+    fun create(context: Context): PendingIntent = PendingIntent.getActivity(
+        context,
+        0,
+        Intent(context, MainActivity::class.java),
+        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+    )
 }

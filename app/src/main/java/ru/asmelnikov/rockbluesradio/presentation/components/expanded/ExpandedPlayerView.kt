@@ -33,6 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import androidx.media3.common.MediaItem
+import kotlin.math.absoluteValue
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import ru.asmelnikov.rockbluesradio.presentation.components.mockMediaItems
@@ -41,7 +42,6 @@ import ru.asmelnikov.rockbluesradio.presentation.player.isBuffering
 import ru.asmelnikov.rockbluesradio.presentation.theme.RockBluesRadioTheme
 import ru.asmelnikov.rockbluesradio.presentation.theme.dimens
 import ru.asmelnikov.rockbluesradio.presentation.utils.isPortrait
-import kotlin.math.absoluteValue
 
 @Composable
 fun ExpandedPlayerView(
@@ -49,7 +49,7 @@ fun ExpandedPlayerView(
     playerState: PlayerState,
     onCollapseTap: () -> Unit,
     onPrevClick: () -> Unit,
-    onNextClick: () -> Unit
+    onNextClick: () -> Unit,
 ) {
     val mediaItems = remember(playerState.player.mediaItemCount) {
         val player = playerState.player
@@ -64,7 +64,7 @@ fun ExpandedPlayerView(
 
     val pagerState = rememberPagerState(
         initialPage = currentIndex,
-        pageCount = { mediaItems.size }
+        pageCount = { mediaItems.size },
     )
 
     LaunchedEffect(currentIndex) {
@@ -107,7 +107,6 @@ fun ExpandedPlayerView(
         onPrevClick = onPrevClick,
         onNextClick = onNextClick,
     )
-
 }
 
 @Composable
@@ -121,15 +120,14 @@ fun ExpandedContent(
     onPlayPauseClick: () -> Unit,
     onCollapseTap: () -> Unit,
     onPrevClick: () -> Unit,
-    onNextClick: () -> Unit
+    onNextClick: () -> Unit,
 ) {
-
     if (isPortrait()) {
         Column(
             modifier = modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Spacer(modifier = Modifier.statusBarsPadding())
             TopBar(onCollapseTap = onCollapseTap)
@@ -152,16 +150,15 @@ fun ExpandedContent(
                                     val scale = lerp(
                                         start = 0.75f,
                                         stop = 1f,
-                                        fraction = 1f - pageOffset.absoluteValue.coerceIn(0f, 1f)
+                                        fraction = 1f - pageOffset.absoluteValue.coerceIn(0f, 1f),
                                     )
                                     scaleX = scale
                                     scaleY = scale
                                 },
-                            artworkUri = mediaItems[page].mediaMetadata.artworkUri ?: Uri.EMPTY
+                            artworkUri = mediaItems[page].mediaMetadata.artworkUri ?: Uri.EMPTY,
                         )
                     }
                 }
-
             }
             Spacer(modifier = Modifier.height(dimens.medium2))
             PlayerTitle(title = title)
@@ -171,7 +168,7 @@ fun ExpandedContent(
                 isPlaying = isPlaying,
                 onPlayPauseClick = onPlayPauseClick,
                 onPrevClick = onPrevClick,
-                onNextClick = onNextClick
+                onNextClick = onNextClick,
             )
             Spacer(modifier = Modifier.height(dimens.medium2))
         }
@@ -180,12 +177,12 @@ fun ExpandedContent(
             Box(modifier = Modifier.fillMaxSize()) {
                 Row(
                     modifier = Modifier.fillMaxSize(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     BoxWithConstraints(
                         modifier = Modifier
                             .weight(1f)
-                            .fillMaxHeight()
+                            .fillMaxHeight(),
                     ) {
                         val artworkSize = maxHeight * 0.5f
 
@@ -193,10 +190,10 @@ fun ExpandedContent(
                             state = pagerState,
                             modifier = Modifier.fillMaxSize(),
                             contentPadding = PaddingValues(
-                                vertical = ((maxHeight - artworkSize) / 2).coerceAtLeast(0.dp)
+                                vertical = ((maxHeight - artworkSize) / 2).coerceAtLeast(0.dp),
                             ),
 
-                            beyondViewportPageCount = 1
+                            beyondViewportPageCount = 1,
                         ) { page ->
                             PlayerArtwork(
                                 modifier = Modifier
@@ -209,13 +206,13 @@ fun ExpandedContent(
                                             stop = 1f,
                                             fraction = 1f - pageOffset.absoluteValue.coerceIn(
                                                 0f,
-                                                1f
-                                            )
+                                                1f,
+                                            ),
                                         )
                                         scaleX = scale
                                         scaleY = scale
                                     },
-                                artworkUri = mediaItems[page].mediaMetadata.artworkUri ?: Uri.EMPTY
+                                artworkUri = mediaItems[page].mediaMetadata.artworkUri ?: Uri.EMPTY,
                             )
                         }
                     }
@@ -225,7 +222,7 @@ fun ExpandedContent(
                             .weight(1f)
                             .fillMaxHeight(),
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
+                        verticalArrangement = Arrangement.Center,
                     ) {
                         Spacer(modifier = Modifier.height(dimens.medium2))
                         PlayerTitle(title = title)
@@ -236,13 +233,13 @@ fun ExpandedContent(
                             isPlaying = isPlaying,
                             onPlayPauseClick = onPlayPauseClick,
                             onPrevClick = onPrevClick,
-                            onNextClick = onNextClick
+                            onNextClick = onNextClick,
                         )
                         Spacer(modifier = Modifier.height(dimens.medium2))
                     }
                 }
                 Row(
-                    modifier = Modifier.align(Alignment.TopStart)
+                    modifier = Modifier.align(Alignment.TopStart),
                 ) {
                     Spacer(modifier = Modifier.statusBarsPadding())
                     TopBar(onCollapseTap = onCollapseTap)
@@ -260,7 +257,7 @@ fun ExpandedContentPreview1(modifier: Modifier = Modifier) {
         Box(
             modifier = modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.surfaceContainerLowest)
+                .background(MaterialTheme.colorScheme.surfaceContainerLowest),
         ) {
             ExpandedContent(
                 pagerState = rememberPagerState(initialPage = 2) {
@@ -273,7 +270,7 @@ fun ExpandedContentPreview1(modifier: Modifier = Modifier) {
                 onPlayPauseClick = {},
                 onCollapseTap = {},
                 onPrevClick = {},
-                onNextClick = {}
+                onNextClick = {},
             )
         }
     }

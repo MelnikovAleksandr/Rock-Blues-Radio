@@ -14,7 +14,7 @@ fun RadioStation.toMediaItem(prefix: String = ""): MediaItem {
         .build()
     return MediaItem.Builder()
         .setUri(url)
-        .setMediaId("${prefix}_${id}")
+        .setMediaId("${prefix}_$id")
         .setMediaMetadata(metadata)
         .build()
 }

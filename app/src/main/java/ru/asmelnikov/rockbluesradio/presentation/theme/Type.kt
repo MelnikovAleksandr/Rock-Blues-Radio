@@ -3,29 +3,29 @@ package ru.asmelnikov.rockbluesradio.presentation.theme
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.googlefonts.GoogleFont
 import androidx.compose.ui.text.googlefonts.Font
-import ru.asmelnikov.rockbluesradio.R
+import androidx.compose.ui.text.googlefonts.GoogleFont
 import androidx.compose.ui.unit.sp
+import ru.asmelnikov.rockbluesradio.R
 
 val provider = GoogleFont.Provider(
     providerAuthority = "com.google.android.gms.fonts",
     providerPackage = "com.google.android.gms",
-    certificates = R.array.com_google_android_gms_fonts_certs
+    certificates = R.array.com_google_android_gms_fonts_certs,
 )
 
 val bodyFontFamily = FontFamily(
     Font(
         googleFont = GoogleFont("Yanone Kaffeesatz"),
         fontProvider = provider,
-    )
+    ),
 )
 
 val displayFontFamily = FontFamily(
     Font(
         googleFont = GoogleFont("Anonymous Pro"),
         fontProvider = provider,
-    )
+    ),
 )
 
 val CompactTypography = Typography(
@@ -43,7 +43,7 @@ val CompactTypography = Typography(
     bodySmall = TextStyle(fontFamily = bodyFontFamily, fontSize = 12.sp),
     labelLarge = TextStyle(fontFamily = bodyFontFamily, fontSize = 14.sp),
     labelMedium = TextStyle(fontFamily = bodyFontFamily, fontSize = 13.sp),
-    labelSmall = TextStyle(fontFamily = bodyFontFamily, fontSize = 12.sp)
+    labelSmall = TextStyle(fontFamily = bodyFontFamily, fontSize = 12.sp),
 )
 
 val MediumTypography = Typography(
@@ -61,7 +61,7 @@ val MediumTypography = Typography(
     bodySmall = TextStyle(fontFamily = bodyFontFamily, fontSize = 14.sp),
     labelLarge = TextStyle(fontFamily = bodyFontFamily, fontSize = 16.sp),
     labelMedium = TextStyle(fontFamily = bodyFontFamily, fontSize = 14.sp),
-    labelSmall = TextStyle(fontFamily = bodyFontFamily, fontSize = 13.sp)
+    labelSmall = TextStyle(fontFamily = bodyFontFamily, fontSize = 13.sp),
 )
 
 val ExpandedTypography = Typography(
@@ -79,6 +79,5 @@ val ExpandedTypography = Typography(
     bodySmall = TextStyle(fontFamily = bodyFontFamily, fontSize = 16.sp),
     labelLarge = TextStyle(fontFamily = bodyFontFamily, fontSize = 18.sp),
     labelMedium = TextStyle(fontFamily = bodyFontFamily, fontSize = 16.sp),
-    labelSmall = TextStyle(fontFamily = bodyFontFamily, fontSize = 14.sp)
+    labelSmall = TextStyle(fontFamily = bodyFontFamily, fontSize = 14.sp),
 )
-

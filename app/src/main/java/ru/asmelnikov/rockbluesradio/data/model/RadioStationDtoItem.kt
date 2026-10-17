@@ -121,5 +121,5 @@ data class RadioStationDtoItem(
     var urlResolved: String? = null,
     @SerialName("votes")
     @Ignore
-    var votes: Int? = null
+    var votes: Int? = null,
 )

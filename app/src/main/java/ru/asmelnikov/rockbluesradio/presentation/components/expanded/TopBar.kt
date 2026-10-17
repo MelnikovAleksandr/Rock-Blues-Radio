@@ -21,17 +21,17 @@ fun TopBar(onCollapseTap: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(dimens.small1),
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         IconButton(
             modifier = Modifier.size(dimens.medium4),
-            onClick = onCollapseTap
+            onClick = onCollapseTap,
         ) {
             Icon(
                 modifier = Modifier.fillMaxSize(0.8f),
                 painter = painterResource(id = R.drawable.keyboard_arrow_down),
                 contentDescription = "Collapse",
-                tint = MaterialTheme.colorScheme.onSurface
+                tint = MaterialTheme.colorScheme.onSurface,
             )
         }
     }

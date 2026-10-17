@@ -35,7 +35,7 @@ fun FavoritesScreen(
     viewModel: FavoritesViewModel = koinViewModel(),
     navController: NavBackStack<NavKey>,
     onItemsUpdate: (List<RadioStation>) -> Unit = {},
-    onFavoriteItemClick: (Int) -> Unit = {}
+    onFavoriteItemClick: (Int) -> Unit = {},
 ) {
     val favoriteStations by viewModel.favorites.collectAsStateWithLifecycle()
 
@@ -66,7 +66,7 @@ fun FavoritesScreen(
         },
         onFavClick = {
             viewModel.removeItem(it)
-        }
+        },
     )
 }
 
@@ -79,21 +79,19 @@ fun RadioStationList(
     hazeState: HazeState,
     onItemClick: (Int) -> Unit = {},
     onBackClick: () -> Unit = {},
-    onFavClick: (RadioStation) -> Unit = {}
+    onFavClick: (RadioStation) -> Unit = {},
 ) {
     Box(modifier = modifier.fillMaxSize()) {
-
         Box(
             modifier = Modifier
                 .hazeSource(state = hazeState)
                 .background(MaterialTheme.colorScheme.background)
-                .fillMaxSize()
+                .fillMaxSize(),
         )
 
         LazyColumn(
-            modifier = Modifier
+            modifier = Modifier,
         ) {
-
             stickyHeader {
                 FavoriteTopAppBar(
                     hazeState = hazeState,
@@ -114,7 +112,7 @@ fun RadioStationList(
                     item = item,
                     currentPlayingStationId = currentPlayingStationId,
                     isFavorite = item.isFavorite,
-                    onFavClick = onFavClick
+                    onFavClick = onFavClick,
                 )
             }
             item {

@@ -48,4 +48,3 @@ fun Modifier.navigationBarsPaddingIfPortrait(): Modifier =
     } else {
         this
     }
-

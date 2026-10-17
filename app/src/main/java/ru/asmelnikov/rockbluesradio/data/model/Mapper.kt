@@ -2,8 +2,8 @@ package ru.asmelnikov.rockbluesradio.data.model
 
 import android.net.Uri
 import androidx.core.net.toUri
-import ru.asmelnikov.rockbluesradio.domain.model.RadioStation
 import java.util.Locale
+import ru.asmelnikov.rockbluesradio.domain.model.RadioStation
 
 object GenreConstants {
     const val MAX_GENRE_CHAR_LENGTH = 10
@@ -25,19 +25,17 @@ fun RadioStationDtoItem.map(isFavorite: Boolean): RadioStation {
         url = urlResolved?.toUri() ?: Uri.EMPTY,
         favicon = favicon?.toUri() ?: Uri.EMPTY,
         isFavorite = isFavorite,
-        genres = genres
+        genres = genres,
     )
 }
 
-fun RadioStation.mapToDto(): RadioStationDtoItem {
-    return RadioStationDtoItem(
-        urlResolved = url.toString(),
-        stationUuid = id,
-        favicon = favicon.toString(),
-        name = name,
-        tags = genres.joinToString(",")
-    )
-}
+fun RadioStation.mapToDto(): RadioStationDtoItem = RadioStationDtoItem(
+    urlResolved = url.toString(),
+    stationUuid = id,
+    favicon = favicon.toString(),
+    name = name,
+    tags = genres.joinToString(","),
+)
 
 fun String.removeNonAlphanumericFirstChar(): String {
     var output = this

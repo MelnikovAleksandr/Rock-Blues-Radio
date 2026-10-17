@@ -31,8 +31,8 @@ fun NoInternetDialog() {
         properties = DialogProperties(
             dismissOnBackPress = false,
             dismissOnClickOutside = false,
-            usePlatformDefaultWidth = false
-        )
+            usePlatformDefaultWidth = false,
+        ),
     ) {
         Card(
             modifier = Modifier
@@ -40,11 +40,11 @@ fun NoInternetDialog() {
                 .padding(dimens.medium1),
             shape = MaterialTheme.shapes.large,
             colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface
+                containerColor = MaterialTheme.colorScheme.surface,
             ),
             elevation = CardDefaults.cardElevation(
-                defaultElevation = dimens.small1
-            )
+                defaultElevation = dimens.small1,
+            ),
         ) {
             Column(
                 modifier = Modifier
@@ -52,25 +52,24 @@ fun NoInternetDialog() {
                     .fillMaxWidth()
                     .padding(dimens.medium2),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(dimens.medium1)
+                verticalArrangement = Arrangement.spacedBy(dimens.medium1),
             ) {
-
                 Text(
                     text = "📡",
-                    style = MaterialTheme.typography.displayLarge
+                    style = MaterialTheme.typography.displayLarge,
                 )
 
                 Text(
                     text = stringResource(R.string.no_internet_title),
                     style = MaterialTheme.typography.headlineLarge,
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
                 )
 
                 Text(
                     text = stringResource(R.string.no_internet_message),
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.secondary
+                    color = MaterialTheme.colorScheme.secondary,
                 )
 
                 Spacer(modifier = Modifier.height(dimens.small1))
@@ -78,13 +77,13 @@ fun NoInternetDialog() {
                 CircularProgressIndicator(
                     modifier = Modifier.size(dimens.medium4),
                     color = MaterialTheme.colorScheme.primary,
-                    strokeWidth = dimens.extraSmall1
+                    strokeWidth = dimens.extraSmall1,
                 )
 
                 Text(
                     text = stringResource(R.string.no_internet_waiting),
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.secondary
+                    color = MaterialTheme.colorScheme.secondary,
                 )
             }
         }

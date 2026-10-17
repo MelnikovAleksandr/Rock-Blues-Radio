@@ -14,7 +14,6 @@ class NetworkMonitor(context: Context) {
     private val connectivityManager =
         context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
-
     private val _isConnected = MutableStateFlow(checkCurrentState())
 
     val isConnected: StateFlow<Boolean> = _isConnected.asStateFlow()
@@ -30,7 +29,7 @@ class NetworkMonitor(context: Context) {
 
         override fun onCapabilitiesChanged(
             network: Network,
-            capabilities: NetworkCapabilities
+            capabilities: NetworkCapabilities,
         ) {
             _isConnected.value =
                 capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)

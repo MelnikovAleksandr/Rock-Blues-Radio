@@ -19,6 +19,6 @@ fun PlayerTitle(title: String) {
         color = MaterialTheme.colorScheme.onSurface,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
-        style = MaterialTheme.typography.displaySmall
+        style = MaterialTheme.typography.displaySmall,
     )
 }

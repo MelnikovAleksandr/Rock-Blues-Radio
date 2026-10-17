@@ -3,6 +3,7 @@ package ru.asmelnikov.rockbluesradio.presentation.theme
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Shapes
+import androidx.compose.material3.Typography
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
@@ -11,7 +12,6 @@ import androidx.compose.runtime.remember
 import androidx.window.core.layout.WindowSizeClass
 import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_EXPANDED_LOWER_BOUND
 import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_MEDIUM_LOWER_BOUND
-import androidx.compose.material3.Typography
 
 private val lightScheme = lightColorScheme(
     primary = primaryLight,
@@ -92,7 +92,7 @@ private val darkScheme = darkColorScheme(
 @Composable
 fun RockBluesRadioTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     val colorScheme = when {
         darkTheme -> darkScheme
@@ -107,34 +107,28 @@ fun RockBluesRadioTheme(
             colorScheme = colorScheme,
             shapes = screenConfig.shapes,
             typography = screenConfig.typography,
-            content = content
+            content = content,
         )
     }
 }
 
 @Composable
 private fun rememberScreenConfig(
-    windowSizeClass: WindowSizeClass
-): ScreenConfig {
-    return remember(windowSizeClass) {
-        when {
-            windowSizeClass.isWidthAtLeastBreakpoint(WIDTH_DP_EXPANDED_LOWER_BOUND) -> {
-                ScreenConfig(ExpandedDimens, ExpandedTypography, ExpandedShapes)
-            }
+    windowSizeClass: WindowSizeClass,
+): ScreenConfig = remember(windowSizeClass) {
+    when {
+        windowSizeClass.isWidthAtLeastBreakpoint(WIDTH_DP_EXPANDED_LOWER_BOUND) -> {
+            ScreenConfig(ExpandedDimens, ExpandedTypography, ExpandedShapes)
+        }
 
-            windowSizeClass.isWidthAtLeastBreakpoint(WIDTH_DP_MEDIUM_LOWER_BOUND) -> {
-                ScreenConfig(MediumDimens, MediumTypography, MediumShapes)
-            }
+        windowSizeClass.isWidthAtLeastBreakpoint(WIDTH_DP_MEDIUM_LOWER_BOUND) -> {
+            ScreenConfig(MediumDimens, MediumTypography, MediumShapes)
+        }
 
-            else -> {
-                ScreenConfig(CompactDimens, CompactTypography, CompactShapes)
-            }
+        else -> {
+            ScreenConfig(CompactDimens, CompactTypography, CompactShapes)
         }
     }
 }
 
-private data class ScreenConfig(
-    val dimens: Dimens,
-    val typography: Typography,
-    val shapes: Shapes
-)
+private data class ScreenConfig(val dimens: Dimens, val typography: Typography, val shapes: Shapes)
