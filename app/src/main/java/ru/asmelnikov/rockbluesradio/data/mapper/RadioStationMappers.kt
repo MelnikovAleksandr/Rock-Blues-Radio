@@ -52,7 +52,8 @@ private fun radioStation(
 )
 
 private fun parseGenres(tags: String?): List<String> = tags?.split(TAGS_SEPARATOR).orEmpty()
-    .filter { it.length <= MAX_GENRE_LENGTH }
+    .map(String::trim)
+    .filter { it.isNotEmpty() && it.length <= MAX_GENRE_LENGTH }
     .take(MAX_GENRE_COUNT)
     .map { genre -> genre.replaceFirstChar { it.titlecase(Locale.getDefault()) } }
 

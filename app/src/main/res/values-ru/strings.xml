@@ -14,4 +14,13 @@
     <string name="no_internet_title">Нет подключения к интернету</string>
     <string name="no_internet_message">Пожалуйста, проверьте подключение к сети и повторите попытку</string>
     <string name="no_internet_waiting">Ожидание подключения…</string>
+
+    <string name="add_to_favorites">Добавить в избранное</string>
+    <string name="remove_from_favorites">Удалить из избранного</string>
+    <string name="play">Воспроизвести</string>
+    <string name="pause">Пауза</string>
+    <string name="previous_station">Предыдущая станция</string>
+    <string name="next_station">Следующая станция</string>
+    <string name="back">Назад</string>
+    <string name="collapse_player">Свернуть плеер</string>
 </resources>

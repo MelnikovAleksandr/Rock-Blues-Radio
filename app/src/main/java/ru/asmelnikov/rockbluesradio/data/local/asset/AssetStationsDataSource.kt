@@ -8,7 +8,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import ru.asmelnikov.rockbluesradio.domain.model.Genre
 
-class StationsAssetDataSource(private val context: Context) {
+class AssetStationsDataSource(private val context: Context) : StationsDataSource {
 
     private val json = Json {
         ignoreUnknownKeys = true
@@ -18,7 +18,7 @@ class StationsAssetDataSource(private val context: Context) {
     private val cache = mutableMapOf<Genre, List<RadioStationDto>>()
     private val cacheMutex = Mutex()
 
-    suspend fun getStations(genre: Genre): List<RadioStationDto> = cacheMutex.withLock {
+    override suspend fun getStations(genre: Genre): List<RadioStationDto> = cacheMutex.withLock {
         cache.getOrPut(genre) { readStations(genre) }
     }
 

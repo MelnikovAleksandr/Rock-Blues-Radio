@@ -2,9 +2,11 @@ package ru.asmelnikov.rockbluesradio.presentation.screens.favorites
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -58,23 +60,28 @@ fun FavoritesContent(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Box(modifier = modifier.fillMaxSize()) {
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        topBar = { FavoritesTopBar(hazeState = hazeState, onBack = onBack) },
+    ) { innerPadding ->
         Box(
             modifier = Modifier
                 .hazeSource(state = hazeState)
                 .background(MaterialTheme.colorScheme.background)
                 .fillMaxSize(),
-        )
-        StationList(
-            stations = favorites,
-            nowPlaying = nowPlaying,
-            hazeState = hazeState,
-            onStationClick = onStationClick,
-            onFavoriteClick = onFavoriteClick,
-            stickyHeader = {
-                FavoritesTopBar(hazeState = hazeState, onBack = onBack)
-            },
-        )
+        ) {
+            StationList(
+                modifier = Modifier.fillMaxSize(),
+                stations = favorites,
+                nowPlaying = nowPlaying,
+                contentPadding = PaddingValues(
+                    top = innerPadding.calculateTopPadding(),
+                    bottom = innerPadding.calculateBottomPadding(),
+                ),
+                onStationClick = onStationClick,
+                onFavoriteClick = onFavoriteClick,
+            )
+        }
     }
 }
 

@@ -124,7 +124,7 @@ private fun PlayerErrorEffect(playerState: PlayerState?, snackbarHostState: Snac
             withDismissAction = true,
         )
         if (result == SnackbarResult.ActionPerformed) {
-            playerState?.retry()
+            playerState.retry()
         }
     }
 }

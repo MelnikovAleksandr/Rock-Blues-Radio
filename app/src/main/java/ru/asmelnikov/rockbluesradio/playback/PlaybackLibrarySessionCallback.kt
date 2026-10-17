@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Bundle
 import androidx.annotation.OptIn
 import androidx.media3.common.MediaItem
-import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.LibraryResult
@@ -27,6 +26,7 @@ class PlaybackLibrarySessionCallback(
     private val scope: CoroutineScope,
     private val player: Player,
     private val catalog: PlaybackCatalog,
+    private val itemFactory: LibraryItemFactory,
     private val toggleFavorite: ToggleFavoriteUseCase,
 ) : MediaLibrarySession.Callback {
 
@@ -59,7 +59,7 @@ class PlaybackLibrarySessionCallback(
             return super.onCustomCommand(session, controller, customCommand, args)
         }
 
-        val station = player.currentMediaItem?.mediaId?.let(catalog::findStation)
+        val station = player.currentMediaItem?.mediaId?.let(catalog::locate)?.station
             ?: return Futures.immediateFuture(SessionResult(SessionError.ERROR_BAD_VALUE))
         scope.launch { toggleFavorite(station) }
         return Futures.immediateFuture(SessionResult(SessionResult.RESULT_SUCCESS))
@@ -69,19 +69,9 @@ class PlaybackLibrarySessionCallback(
         session: MediaLibrarySession,
         browser: MediaSession.ControllerInfo,
         params: LibraryParams?,
-    ): ListenableFuture<LibraryResult<MediaItem>> {
-        val rootMetadata = MediaMetadata.Builder()
-            .setTitle("")
-            .setIsPlayable(false)
-            .setIsBrowsable(true)
-            .setMediaType(MediaMetadata.MEDIA_TYPE_FOLDER_RADIO_STATIONS)
-            .build()
-        val rootItem = MediaItem.Builder()
-            .setMediaId(PlaybackContract.ROOT_ID)
-            .setMediaMetadata(rootMetadata)
-            .build()
-        return Futures.immediateFuture(LibraryResult.ofItem(rootItem, params))
-    }
+    ): ListenableFuture<LibraryResult<MediaItem>> = Futures.immediateFuture(
+        LibraryResult.ofItem(itemFactory.root(), params),
+    )
 
     override fun onGetChildren(
         session: MediaLibrarySession,
@@ -92,7 +82,7 @@ class PlaybackLibrarySessionCallback(
         params: LibraryParams?,
     ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> = scope.launchFuture {
         catalog.awaitLoaded()
-        LibraryResult.ofItemList(ImmutableList.copyOf(catalog.children(context, parentId)), params)
+        LibraryResult.ofItemList(ImmutableList.copyOf(itemFactory.children(catalog, parentId)), params)
     }
 
     override fun onGetItem(
@@ -101,8 +91,8 @@ class PlaybackLibrarySessionCallback(
         mediaId: String,
     ): ListenableFuture<LibraryResult<MediaItem>> = scope.launchFuture {
         catalog.awaitLoaded()
-        catalog.findMediaItem(mediaId)
-            ?.let { LibraryResult.ofItem(it, null) }
+        catalog.locate(mediaId)
+            ?.let { LibraryResult.ofItem(itemFactory.station(it), null) }
             ?: LibraryResult.ofError(SessionError.ERROR_BAD_VALUE)
     }
 
@@ -118,27 +108,18 @@ class PlaybackLibrarySessionCallback(
             catalog.awaitLoaded()
             val requestedItem = mediaItems.singleOrNull()
             if (requestedItem != null) {
-                expandToFolderQueue(requestedItem.mediaId)
+                queueFor(requestedItem.mediaId)
             } else {
-                mediaItems.mapNotNull { item ->
-                    if (item.localConfiguration != null) item else catalog.findMediaItem(item.mediaId)
-                }.toMutableList()
-            }
+                mediaItems.mapNotNull { item -> item.takeIf { it.localConfiguration != null } ?: resolve(item.mediaId) }
+            }.toMutableList()
         }
     }
 
-    private fun expandToFolderQueue(mediaId: String): MutableList<MediaItem> {
-        val folder = PlaybackContract.folderOf(mediaId)
-            ?: return listOfNotNull(catalog.findMediaItem(mediaId)).toMutableList()
-        val stations = catalog.stations(folder)
-        val stationId = PlaybackContract.stationId(mediaId)
-        val selectedIndex = stations.indexOfFirst { it.id == stationId }
-        if (selectedIndex == -1) {
-            return listOfNotNull(catalog.findMediaItem(mediaId)).toMutableList()
-        }
-
+    private fun queueFor(mediaId: String): List<MediaItem> {
+        val queue = catalog.queueStartingAt(mediaId) ?: return listOfNotNull(resolve(mediaId))
         player.repeatMode = Player.REPEAT_MODE_ALL
-        val queue = stations.drop(selectedIndex) + stations.take(selectedIndex)
-        return queue.toMediaItems(folder).toMutableList()
+        return itemFactory.queue(queue)
     }
+
+    private fun resolve(mediaId: String): MediaItem? = catalog.locate(mediaId)?.let(itemFactory::station)
 }

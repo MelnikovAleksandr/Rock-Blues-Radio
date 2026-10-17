@@ -27,6 +27,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
@@ -96,7 +98,7 @@ fun FavoritesTopBar(
                 Icon(
                     modifier = Modifier.fillMaxSize(fraction = 0.8f),
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
+                    contentDescription = stringResource(R.string.back),
                 )
             }
             Spacer(modifier = Modifier.width(dimens.small1))
@@ -132,8 +134,11 @@ private fun TopBarTitle(text: String) {
 
 @Composable
 private fun FavoritesButton(onClick: () -> Unit) {
+    val description = stringResource(R.string.favorite_stations)
     IconButton(
-        modifier = Modifier.size(dimens.medium4),
+        modifier = Modifier
+            .size(dimens.medium4)
+            .semantics { contentDescription = description },
         onClick = onClick,
     ) {
         val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.favorite_main))

@@ -29,6 +29,7 @@ class PlaybackService : MediaLibraryService() {
             scope = lifecycleScope,
             player = player,
             catalog = catalog,
+            itemFactory = LibraryItemFactory(this),
             toggleFavorite = toggleFavorite,
         )
         mediaLibrarySession = MediaLibrarySession.Builder(this, player, callback)

@@ -12,6 +12,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import ru.asmelnikov.rockbluesradio.R
 import ru.asmelnikov.rockbluesradio.presentation.theme.dimens
 
@@ -30,7 +31,7 @@ fun CollapseBar(onCollapse: () -> Unit, modifier: Modifier = Modifier) {
             Icon(
                 modifier = Modifier.fillMaxSize(0.8f),
                 painter = painterResource(R.drawable.keyboard_arrow_down),
-                contentDescription = "Collapse",
+                contentDescription = stringResource(R.string.collapse_player),
                 tint = MaterialTheme.colorScheme.onSurface,
             )
         }
