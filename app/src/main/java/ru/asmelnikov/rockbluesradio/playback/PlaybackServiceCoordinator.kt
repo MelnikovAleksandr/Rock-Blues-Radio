@@ -1,8 +1,10 @@
 package ru.asmelnikov.rockbluesradio.playback
 
 import android.content.Context
+import androidx.annotation.OptIn
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.MediaLibraryService.MediaLibrarySession
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -62,6 +64,7 @@ class PlaybackServiceCoordinator(
         sessionProvider()?.notifyChildrenChanged(parentId, catalog.childCount(parentId), null)
     }
 
+    @OptIn(UnstableApi::class)
     private fun updateFavoriteButton() {
         sessionProvider()?.setMediaButtonPreferences(
             FavoriteCommandButton.preferences(context, player.currentMediaItem, catalog.favoriteStations),

@@ -15,9 +15,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import dev.chrisbanes.haze.HazeState
-import dev.chrisbanes.haze.hazeSource
-import dev.chrisbanes.haze.rememberHazeState
 import ru.asmelnikov.rockbluesradio.domain.model.RadioStation
 import ru.asmelnikov.rockbluesradio.presentation.player.NowPlaying
 import ru.asmelnikov.rockbluesradio.presentation.preview.PreviewData
@@ -29,25 +26,18 @@ private val MiniPlayerSpace = 60.dp
 fun StationList(
     stations: List<RadioStation>,
     nowPlaying: NowPlaying,
-    hazeState: HazeState,
     onStationClick: (index: Int) -> Unit,
     onFavoriteClick: (RadioStation) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
-    stickyHeader: (@Composable () -> Unit)? = null,
 ) {
     LazyColumn(
         modifier = modifier,
         contentPadding = contentPadding,
     ) {
-        if (stickyHeader != null) {
-            stickyHeader { stickyHeader() }
-        }
-
         itemsIndexed(items = stations, key = { _, station -> station.id }) { index, station ->
             RadioStationRow(
                 modifier = Modifier
-                    .hazeSource(state = hazeState)
                     .animateItem()
                     .clickable { onStationClick(index) }
                     .fillMaxWidth(),
@@ -76,7 +66,6 @@ private fun StationListPreview() {
             StationList(
                 stations = PreviewData.stations(),
                 nowPlaying = NowPlaying(),
-                hazeState = rememberHazeState(),
                 onStationClick = {},
                 onFavoriteClick = {},
             )

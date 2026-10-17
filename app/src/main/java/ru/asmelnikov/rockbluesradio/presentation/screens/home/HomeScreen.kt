@@ -103,7 +103,6 @@ fun HomeContent(
                     modifier = Modifier.fillMaxSize(),
                     stations = stations,
                     nowPlaying = nowPlaying,
-                    hazeState = hazeState,
                     contentPadding = PaddingValues(
                         top = innerPadding.calculateTopPadding(),
                         bottom = innerPadding.calculateBottomPadding(),

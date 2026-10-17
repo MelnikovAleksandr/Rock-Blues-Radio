@@ -16,4 +16,13 @@
     <string name="no_internet_title">No internet connection</string>
     <string name="no_internet_message">Please check your network connection and try again</string>
     <string name="no_internet_waiting">Waiting for connection…</string>
+
+    <string name="add_to_favorites">Add to favorites</string>
+    <string name="remove_from_favorites">Remove from favorites</string>
+    <string name="play">Play</string>
+    <string name="pause">Pause</string>
+    <string name="previous_station">Previous station</string>
+    <string name="next_station">Next station</string>
+    <string name="back">Back</string>
+    <string name="collapse_player">Collapse player</string>
 </resources>

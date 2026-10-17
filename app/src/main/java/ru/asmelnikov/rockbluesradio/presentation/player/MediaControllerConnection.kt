@@ -2,6 +2,8 @@ package ru.asmelnikov.rockbluesradio.presentation.player
 
 import android.content.ComponentName
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -25,11 +27,15 @@ class MediaControllerConnection(
 ) {
     private val appContext = context.applicationContext
     private val sessionToken = SessionToken(appContext, ComponentName(appContext, PlaybackService::class.java))
+    private val mainHandler = Handler(Looper.getMainLooper())
+    private val reconnectRunnable = Runnable { if (isActive) connect() }
+    private val connectTimeoutRunnable = Runnable { reconnect() }
     private var controllerFuture: ListenableFuture<MediaController>? = null
     private var isActive = false
 
     fun connect() {
         isActive = true
+        mainHandler.removeCallbacks(reconnectRunnable)
         if (controllerFuture != null) return
 
         lateinit var future: ListenableFuture<MediaController>
@@ -37,18 +43,20 @@ class MediaControllerConnection(
             .setListener(
                 object : MediaController.Listener {
                     override fun onDisconnected(controller: MediaController) {
-                        onSessionDisconnected(future)
+                        if (controllerFuture === future) reconnect()
                     }
                 },
             )
             .buildAsync()
         controllerFuture = future
+        mainHandler.postDelayed(connectTimeoutRunnable, CONNECT_TIMEOUT_MILLIS)
         future.addListener(
             {
                 if (controllerFuture !== future) return@addListener
+                mainHandler.removeCallbacks(connectTimeoutRunnable)
                 runCatching { future.get() }
                     .onSuccess(onConnected)
-                    .onFailure { releaseController() }
+                    .onFailure { reconnect(delayMillis = RETRY_DELAY_MILLIS) }
             },
             ContextCompat.getMainExecutor(appContext),
         )
@@ -56,20 +64,26 @@ class MediaControllerConnection(
 
     fun disconnect() {
         isActive = false
+        mainHandler.removeCallbacks(reconnectRunnable)
         releaseController()
     }
 
-    private fun onSessionDisconnected(future: ListenableFuture<MediaController>) {
-        if (controllerFuture !== future) return
+    private fun reconnect(delayMillis: Long = 0) {
         releaseController()
-        if (isActive) connect()
+        if (isActive) mainHandler.postDelayed(reconnectRunnable, delayMillis)
     }
 
     private fun releaseController() {
+        mainHandler.removeCallbacks(connectTimeoutRunnable)
         val future = controllerFuture ?: return
         controllerFuture = null
         MediaController.releaseFuture(future)
         onDisconnected()
+    }
+
+    private companion object {
+        const val CONNECT_TIMEOUT_MILLIS = 3_000L
+        const val RETRY_DELAY_MILLIS = 1_000L
     }
 }
 
