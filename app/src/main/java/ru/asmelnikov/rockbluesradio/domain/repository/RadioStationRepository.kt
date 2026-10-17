@@ -6,13 +6,11 @@ import ru.asmelnikov.rockbluesradio.domain.model.RadioStation
 
 interface RadioStationRepository {
 
-    suspend fun getRadioStationsByGenre(
-        genre: Genre,
-    ): List<RadioStation>
+    suspend fun getStationsByGenre(genre: Genre): List<RadioStation>
 
-    fun getFavoriteRadioStations(): Flow<List<RadioStation>>
+    fun observeFavoriteStations(): Flow<List<RadioStation>>
 
-    suspend fun getFavoriteRadioStationByStationUUID(stationUuid: String): RadioStation?
+    suspend fun isFavorite(stationId: String): Boolean
 
     suspend fun addToFavorites(station: RadioStation)
 

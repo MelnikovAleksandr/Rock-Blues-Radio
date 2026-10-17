@@ -1,14 +1,15 @@
 package ru.asmelnikov.rockbluesradio.domain.di
 
+import org.koin.core.module.dsl.factoryOf
 import org.koin.dsl.module
-import ru.asmelnikov.rockbluesradio.domain.usecase.AddToOrRemoveFromFavoritesUseCase
-import ru.asmelnikov.rockbluesradio.domain.usecase.GetFavoriteRadioStationsUseCase
-import ru.asmelnikov.rockbluesradio.domain.usecase.GetFavoritesRadioCountUseCase
-import ru.asmelnikov.rockbluesradio.domain.usecase.GetRadioStationsUseCase
+import ru.asmelnikov.rockbluesradio.domain.usecase.ObserveFavoriteStationsUseCase
+import ru.asmelnikov.rockbluesradio.domain.usecase.ObserveFavoritesCountUseCase
+import ru.asmelnikov.rockbluesradio.domain.usecase.ObserveStationsByGenreUseCase
+import ru.asmelnikov.rockbluesradio.domain.usecase.ToggleFavoriteUseCase
 
 val domainModule = module {
-    factory { GetRadioStationsUseCase(get()) }
-    factory { GetFavoriteRadioStationsUseCase(get()) }
-    factory { AddToOrRemoveFromFavoritesUseCase(get()) }
-    factory { GetFavoritesRadioCountUseCase(get()) }
+    factoryOf(::ObserveStationsByGenreUseCase)
+    factoryOf(::ObserveFavoriteStationsUseCase)
+    factoryOf(::ObserveFavoritesCountUseCase)
+    factoryOf(::ToggleFavoriteUseCase)
 }

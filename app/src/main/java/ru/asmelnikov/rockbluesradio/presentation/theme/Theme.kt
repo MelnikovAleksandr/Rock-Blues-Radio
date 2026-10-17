@@ -102,7 +102,7 @@ fun RockBluesRadioTheme(
     val windowSizeClass = currentWindowAdaptiveInfoV2().windowSizeClass
     val screenConfig = rememberScreenConfig(windowSizeClass)
 
-    AppUtils(appDimens = screenConfig.dimens) {
+    ProvideDimens(dimens = screenConfig.dimens) {
         MaterialTheme(
             colorScheme = colorScheme,
             shapes = screenConfig.shapes,

@@ -1,55 +1,33 @@
 package ru.asmelnikov.rockbluesradio.data.repository
 
-import android.content.Context
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.withContext
-import kotlinx.serialization.json.Json
-import ru.asmelnikov.rockbluesradio.data.database.FavoriteRadioStationsDao
-import ru.asmelnikov.rockbluesradio.data.model.RadioStationDtoItem
-import ru.asmelnikov.rockbluesradio.data.model.map
-import ru.asmelnikov.rockbluesradio.data.model.mapToDto
+import ru.asmelnikov.rockbluesradio.data.local.asset.StationsAssetDataSource
+import ru.asmelnikov.rockbluesradio.data.local.database.FavoriteStationDao
+import ru.asmelnikov.rockbluesradio.data.mapper.toDomain
+import ru.asmelnikov.rockbluesradio.data.mapper.toFavoriteEntity
 import ru.asmelnikov.rockbluesradio.domain.model.Genre
 import ru.asmelnikov.rockbluesradio.domain.model.RadioStation
 import ru.asmelnikov.rockbluesradio.domain.repository.RadioStationRepository
 
-class RadioStationRepositoryImpl(private val radioStationsDao: FavoriteRadioStationsDao, private val context: Context) :
-    RadioStationRepository {
+class RadioStationRepositoryImpl(
+    private val assetDataSource: StationsAssetDataSource,
+    private val favoriteStationDao: FavoriteStationDao,
+) : RadioStationRepository {
 
-    companion object {
-        private val json = Json {
-            ignoreUnknownKeys = true
-            isLenient = true
-        }
-    }
+    override suspend fun getStationsByGenre(genre: Genre): List<RadioStation> =
+        assetDataSource.getStations(genre).map { it.toDomain() }
 
-    override suspend fun getRadioStationsByGenre(genre: Genre): List<RadioStation> = withContext(Dispatchers.IO) {
-        val fileName = when (genre) {
-            Genre.Blues -> "blues_data.json"
-            Genre.Rock -> "rock_data.json"
-        }
+    override fun observeFavoriteStations(): Flow<List<RadioStation>> =
+        favoriteStationDao.observeAll().map { entities -> entities.map { it.toDomain() } }
 
-        val jsonString = context.assets.open(fileName).bufferedReader().use {
-            it.readText()
-        }
-        val dtoList = json.decodeFromString<List<RadioStationDtoItem>>(jsonString)
-        dtoList.map { it.map(false) }
-    }
-
-    override fun getFavoriteRadioStations(): Flow<List<RadioStation>> =
-        radioStationsDao.getAllFavoriteRadioStations().map {
-            it.map { item -> item.map(isFavorite = true) }
-        }
-
-    override suspend fun getFavoriteRadioStationByStationUUID(stationUuid: String): RadioStation? =
-        radioStationsDao.getFavoriteRadioStationByStationUUID(stationUuid)?.map(isFavorite = true)
+    override suspend fun isFavorite(stationId: String): Boolean = favoriteStationDao.exists(stationId)
 
     override suspend fun addToFavorites(station: RadioStation) {
-        radioStationsDao.insertRadioStations(station.mapToDto())
+        favoriteStationDao.insert(station.toFavoriteEntity())
     }
 
     override suspend fun removeFromFavorites(station: RadioStation) {
-        radioStationsDao.deleteRadioStations(station.mapToDto())
+        favoriteStationDao.delete(station.toFavoriteEntity())
     }
 }
